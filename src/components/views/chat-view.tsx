@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Mic, Paperclip, StopCircle } from "lucide-react";
+import { Send, Mic, Paperclip, StopCircle, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAppStore, type Message } from "@/stores/app-store";
 
@@ -77,7 +77,7 @@ export function ChatView() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  const { messages, isTyping, addMessage, setIsTyping, connected } =
+  const { messages, isTyping, addMessage, setIsTyping, clearMessages, connected } =
     useAppStore();
 
   const scrollToBottom = () => {
@@ -88,8 +88,8 @@ export function ChatView() {
     scrollToBottom();
   }, [messages, isTyping]);
 
-  const handleSend = () => {
-    if (!input.trim() || !connected) return;
+  const handleSend = async () => {
+    if (!input.trim()) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -99,21 +99,35 @@ export function ChatView() {
     };
 
     addMessage(userMessage);
+    const prompt = input.trim();
     setInput("");
     setIsTyping(true);
 
-    // Simulate response (replace with actual gateway call)
-    setTimeout(() => {
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: prompt }),
+      });
+      const data = await res.json();
+
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content:
-          "I'm your OpenClaw assistant! I can help you with calendar events, reminders, send messages, and much more. What would you like to do?",
+        content: data.response || data.error || "No response",
         timestamp: new Date(),
       };
       addMessage(assistantMessage);
-      setIsTyping(false);
-    }, 1500);
+    } catch (e: any) {
+      addMessage({
+        id: (Date.now() + 1).toString(),
+        role: "assistant",
+        content: `Error: ${e.message}`,
+        timestamp: new Date(),
+      });
+    }
+
+    setIsTyping(false);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -140,7 +154,6 @@ export function ChatView() {
               your calendar, or just have a conversation.
             </p>
 
-            {/* Quick actions */}
             <div className="flex flex-wrap justify-center gap-2 mt-8">
               {[
                 "What can you do?",
@@ -164,12 +177,26 @@ export function ChatView() {
             </div>
           </div>
         ) : (
-          <AnimatePresence mode="popLayout">
-            {messages.map((message) => (
-              <MessageBubble key={message.id} message={message} />
-            ))}
-            {isTyping && <TypingIndicator />}
-          </AnimatePresence>
+          <>
+            <AnimatePresence mode="popLayout">
+              {messages.map((message) => (
+                <MessageBubble key={message.id} message={message} />
+              ))}
+              {isTyping && <TypingIndicator />}
+            </AnimatePresence>
+            {/* Clear button */}
+            {messages.length > 0 && !isTyping && (
+              <div className="flex justify-center pt-4">
+                <button
+                  onClick={clearMessages}
+                  className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-red-400 transition-colors"
+                >
+                  <Trash2 className="w-3 h-3" />
+                  Clear conversation
+                </button>
+              </div>
+            )}
+          </>
         )}
         <div ref={messagesEndRef} />
       </div>
@@ -185,7 +212,6 @@ export function ChatView() {
             "transition-all duration-200"
           )}
         >
-          {/* Attachment button */}
           <button
             className={cn(
               "p-2 rounded-xl text-gray-400 hover:text-gray-600",
@@ -196,37 +222,28 @@ export function ChatView() {
             <Paperclip className="w-5 h-5" />
           </button>
 
-          {/* Text input */}
           <textarea
             ref={inputRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={
-              connected ? "Ask me anything..." : "Connect to start chatting..."
-            }
-            disabled={!connected}
+            placeholder="Ask me anything..."
             rows={1}
             className={cn(
               "flex-1 bg-transparent resize-none",
               "text-gray-900 dark:text-white placeholder-gray-400",
               "focus:outline-none",
-              "max-h-32",
-              "disabled:opacity-50"
+              "max-h-32"
             )}
-            style={{
-              minHeight: "24px",
-              height: "auto",
-            }}
+            style={{ minHeight: "24px", height: "auto" }}
           />
 
-          {/* Voice / Send button */}
           {input.trim() ? (
             <motion.button
               initial={{ scale: 0.8 }}
               animate={{ scale: 1 }}
               onClick={handleSend}
-              disabled={!connected}
+              disabled={isTyping}
               className={cn(
                 "p-2.5 rounded-xl",
                 "bg-blue-500 text-white",
@@ -240,13 +257,11 @@ export function ChatView() {
           ) : (
             <button
               onClick={() => setIsRecording(!isRecording)}
-              disabled={!connected}
               className={cn(
                 "p-2.5 rounded-xl",
                 isRecording
                   ? "bg-red-500 text-white"
                   : "text-gray-400 hover:text-gray-600 hover:bg-gray-200 dark:hover:bg-gray-700",
-                "disabled:opacity-50 disabled:cursor-not-allowed",
                 "transition-colors duration-200"
               )}
             >

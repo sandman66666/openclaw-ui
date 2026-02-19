@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/stores/app-store";
+import { useDataLoader } from "@/hooks/use-data";
 import { Header } from "./layout/header";
 import { Sidebar } from "./layout/sidebar";
 import { BottomNav } from "./layout/bottom-nav";
@@ -11,6 +12,8 @@ import { ChatView } from "./views/chat-view";
 import { SkillsView } from "./views/skills-view";
 import { ChannelsView } from "./views/channels-view";
 import { SettingsView } from "./views/settings-view";
+import { CronView } from "./views/cron-view";
+import { AgentsView } from "./views/agents-view";
 
 const pageVariants = {
   initial: { opacity: 0, y: 10 },
@@ -20,6 +23,9 @@ const pageVariants = {
 
 export function AppShell() {
   const { activeTab, theme } = useAppStore();
+
+  // Load real data from API
+  useDataLoader();
 
   // Apply theme
   useEffect(() => {
@@ -47,6 +53,10 @@ export function AppShell() {
         return <SkillsView />;
       case "channels":
         return <ChannelsView />;
+      case "cron":
+        return <CronView />;
+      case "agents":
+        return <AgentsView />;
       case "settings":
         return <SettingsView />;
       default:

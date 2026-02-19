@@ -14,8 +14,17 @@ export interface Skill {
   description: string;
   icon: string;
   enabled: boolean;
+  eligible: boolean;
+  source: string;
   requiresApiKey?: boolean;
   apiKey?: string;
+  missing?: {
+    bins: string[];
+    anyBins: string[];
+    env: string[];
+    config: string[];
+    os: string[];
+  };
 }
 
 export interface Channel {
@@ -24,7 +33,49 @@ export interface Channel {
   icon: string;
   connected: boolean;
   status?: string;
+  config?: Record<string, any>;
 }
+
+export interface CronJob {
+  id: string;
+  agentId: string;
+  name: string;
+  enabled: boolean;
+  createdAtMs: number;
+  updatedAtMs: number;
+  schedule: {
+    kind: string;
+    expr?: string;
+    tz?: string;
+    everyMs?: number;
+    anchorMs?: number;
+  };
+  sessionTarget: string;
+  wakeMode: string;
+  payload: {
+    kind: string;
+    message: string;
+    timeoutSeconds: number;
+  };
+  delivery: { mode: string };
+  state: {
+    nextRunAtMs: number;
+    lastRunAtMs: number;
+    lastStatus: string;
+    lastDurationMs: number;
+    consecutiveErrors: number;
+    runningAtMs?: number;
+  };
+}
+
+export interface Agent {
+  id: string;
+  model: string;
+  workspace: string;
+  heartbeat: Record<string, any>;
+}
+
+export type TabId = "chat" | "skills" | "channels" | "cron" | "agents" | "settings";
 
 interface AppState {
   // Theme
@@ -34,8 +85,9 @@ interface AppState {
   // Gateway connection
   gatewayUrl: string;
   gatewayToken: string;
+  gatewayPassword: string;
   connected: boolean;
-  setGatewayConfig: (url: string, token: string) => void;
+  setGatewayConfig: (url: string, token: string, password?: string) => void;
   setConnected: (connected: boolean) => void;
 
   // Chat
@@ -55,9 +107,21 @@ interface AppState {
   channels: Channel[];
   setChannels: (channels: Channel[]) => void;
 
+  // Cron Jobs
+  cronJobs: CronJob[];
+  setCronJobs: (jobs: CronJob[]) => void;
+
+  // Agents
+  agents: Agent[];
+  setAgents: (agents: Agent[]) => void;
+
   // Navigation
-  activeTab: "chat" | "skills" | "channels" | "settings";
-  setActiveTab: (tab: "chat" | "skills" | "channels" | "settings") => void;
+  activeTab: TabId;
+  setActiveTab: (tab: TabId) => void;
+
+  // Loading states
+  loading: Record<string, boolean>;
+  setLoading: (key: string, value: boolean) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -68,10 +132,12 @@ export const useAppStore = create<AppState>()(
       setTheme: (theme) => set({ theme }),
 
       // Gateway
-      gatewayUrl: "",
-      gatewayToken: "",
+      gatewayUrl: "ws://127.0.0.1:18789",
+      gatewayToken: "8f8afc3342e722fa01c4876e8be98ab6cd849ec0c62be140",
+      gatewayPassword: "Ponmje=5040",
       connected: false,
-      setGatewayConfig: (url, token) => set({ gatewayUrl: url, gatewayToken: token }),
+      setGatewayConfig: (url, token, password) =>
+        set({ gatewayUrl: url, gatewayToken: token, ...(password !== undefined && { gatewayPassword: password }) }),
       setConnected: (connected) => set({ connected }),
 
       // Chat
@@ -82,54 +148,8 @@ export const useAppStore = create<AppState>()(
       setIsTyping: (isTyping) => set({ isTyping }),
       clearMessages: () => set({ messages: [] }),
 
-      // Skills
-      skills: [
-        {
-          id: "image-gen",
-          name: "Image Generation",
-          description: "Create images with AI",
-          icon: "🎨",
-          enabled: true,
-          requiresApiKey: true,
-        },
-        {
-          id: "voice-transcription",
-          name: "Voice Transcription",
-          description: "Convert speech to text",
-          icon: "🎤",
-          enabled: true,
-          requiresApiKey: true,
-        },
-        {
-          id: "web-search",
-          name: "Web Search",
-          description: "Search the internet",
-          icon: "🌐",
-          enabled: false,
-        },
-        {
-          id: "calendar",
-          name: "Calendar",
-          description: "Manage your schedule",
-          icon: "📅",
-          enabled: true,
-        },
-        {
-          id: "reminders",
-          name: "Reminders",
-          description: "Set reminders and alerts",
-          icon: "🔔",
-          enabled: true,
-        },
-        {
-          id: "voice-calls",
-          name: "Voice Calls",
-          description: "Make and receive calls",
-          icon: "📞",
-          enabled: false,
-          requiresApiKey: true,
-        },
-      ],
+      // Skills (start empty, load from API)
+      skills: [],
       setSkills: (skills) => set({ skills }),
       toggleSkill: (id) =>
         set((state) => ({
@@ -144,17 +164,26 @@ export const useAppStore = create<AppState>()(
           ),
         })),
 
-      // Channels
-      channels: [
-        { id: "whatsapp", name: "WhatsApp", icon: "📱", connected: false },
-        { id: "telegram", name: "Telegram", icon: "✈️", connected: false },
-        { id: "discord", name: "Discord", icon: "🎮", connected: false },
-      ],
+      // Channels (start empty, load from API)
+      channels: [],
       setChannels: (channels) => set({ channels }),
+
+      // Cron Jobs
+      cronJobs: [],
+      setCronJobs: (cronJobs) => set({ cronJobs }),
+
+      // Agents
+      agents: [],
+      setAgents: (agents) => set({ agents }),
 
       // Navigation
       activeTab: "chat",
       setActiveTab: (activeTab) => set({ activeTab }),
+
+      // Loading
+      loading: {},
+      setLoading: (key, value) =>
+        set((state) => ({ loading: { ...state.loading, [key]: value } })),
     }),
     {
       name: "openclaw-storage",
@@ -162,7 +191,8 @@ export const useAppStore = create<AppState>()(
         theme: state.theme,
         gatewayUrl: state.gatewayUrl,
         gatewayToken: state.gatewayToken,
-        skills: state.skills,
+        gatewayPassword: state.gatewayPassword,
+        activeTab: state.activeTab,
       }),
     }
   )

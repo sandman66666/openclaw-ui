@@ -6,14 +6,14 @@ import {
   Moon,
   Sun,
   Monitor,
-  Server,
-  Key,
   Bell,
   Shield,
   HelpCircle,
   ChevronRight,
   Check,
   ExternalLink,
+  Wifi,
+  WifiOff,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -39,7 +39,8 @@ function SettingRow({
       className={cn(
         "w-full flex items-center gap-4 p-4 text-left",
         "transition-colors duration-200",
-        onClick && "hover:bg-gray-50 dark:hover:bg-gray-800/50 active:bg-gray-100 dark:active:bg-gray-800"
+        onClick &&
+          "hover:bg-gray-50 dark:hover:bg-gray-800/50 active:bg-gray-100 dark:active:bg-gray-800"
       )}
     >
       <div
@@ -59,7 +60,8 @@ function SettingRow({
           </p>
         )}
       </div>
-      {trailing || (onClick && <ChevronRight className="w-5 h-5 text-gray-400" />)}
+      {trailing ||
+        (onClick && <ChevronRight className="w-5 h-5 text-gray-400" />)}
     </button>
   );
 }
@@ -132,40 +134,79 @@ function ThemeSelector() {
   );
 }
 
+const inputCn = cn(
+  "mt-1 w-full px-4 py-3 rounded-xl",
+  "bg-gray-100 dark:bg-gray-900",
+  "border border-gray-200 dark:border-gray-700",
+  "text-gray-900 dark:text-white",
+  "placeholder-gray-400",
+  "focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+);
+
 function GatewayConfig() {
-  const { gatewayUrl, gatewayToken, setGatewayConfig, connected, setConnected } =
-    useAppStore();
+  const {
+    gatewayUrl,
+    gatewayToken,
+    gatewayPassword,
+    setGatewayConfig,
+    connected,
+    setConnected,
+  } = useAppStore();
   const [url, setUrl] = useState(gatewayUrl);
   const [token, setToken] = useState(gatewayToken);
+  const [password, setPassword] = useState(gatewayPassword);
   const [isEditing, setIsEditing] = useState(!gatewayUrl);
+  const [testing, setTesting] = useState(false);
 
-  const handleSave = () => {
-    setGatewayConfig(url, token);
-    setIsEditing(false);
-    // Simulate connection
-    if (url && token) {
-      setConnected(true);
+  const handleSave = async () => {
+    setGatewayConfig(url, token, password);
+    setTesting(true);
+    // Test the connection by hitting an API route
+    try {
+      const res = await fetch("/api/skills");
+      if (res.ok) {
+        setConnected(true);
+      }
+    } catch {
+      // Still save config even if test fails
     }
+    setTesting(false);
+    setIsEditing(false);
   };
 
   if (!isEditing && gatewayUrl) {
     return (
       <div className="p-4 space-y-4">
         <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Gateway URL</p>
+          <div className="min-w-0">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Gateway URL
+            </p>
             <p className="font-medium text-gray-900 dark:text-white truncate">
               {gatewayUrl}
             </p>
           </div>
-          {connected && (
-            <span className="flex items-center gap-1 px-2 py-1 rounded-full bg-green-50 dark:bg-green-500/10 text-green-600 dark:text-green-400 text-xs font-medium">
-              <span className="w-2 h-2 rounded-full bg-green-500" />
+          {connected ? (
+            <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-50 dark:bg-green-500/10 text-green-600 dark:text-green-400 text-xs font-medium shrink-0">
+              <Wifi className="w-3 h-3" />
               Connected
+            </span>
+          ) : (
+            <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-50 dark:bg-red-500/10 text-red-500 text-xs font-medium shrink-0">
+              <WifiOff className="w-3 h-3" />
+              Disconnected
             </span>
           )}
         </div>
-        <Button variant="secondary" size="sm" onClick={() => setIsEditing(true)}>
+        <div className="flex gap-3 text-sm text-gray-500 dark:text-gray-400">
+          <span>Token: ••••{gatewayToken.slice(-8)}</span>
+          <span>Password: ••••••</span>
+        </div>
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => setIsEditing(true)}
+        >
           Change Connection
         </Button>
       </div>
@@ -183,15 +224,8 @@ function GatewayConfig() {
             type="url"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            placeholder="https://your-gateway.railway.app"
-            className={cn(
-              "mt-1 w-full px-4 py-3 rounded-xl",
-              "bg-gray-100 dark:bg-gray-900",
-              "border border-gray-200 dark:border-gray-700",
-              "text-gray-900 dark:text-white",
-              "placeholder-gray-400",
-              "focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-            )}
+            placeholder="ws://127.0.0.1:18789"
+            className={inputCn}
           />
         </div>
         <div>
@@ -203,21 +237,42 @@ function GatewayConfig() {
             value={token}
             onChange={(e) => setToken(e.target.value)}
             placeholder="Your gateway token"
-            className={cn(
-              "mt-1 w-full px-4 py-3 rounded-xl",
-              "bg-gray-100 dark:bg-gray-900",
-              "border border-gray-200 dark:border-gray-700",
-              "text-gray-900 dark:text-white",
-              "placeholder-gray-400",
-              "focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-            )}
+            className={inputCn}
           />
+        </div>
+        <div>
+          <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            Gateway Password
+          </label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Your gateway password"
+            className={inputCn}
+          />
+          <p className="text-xs text-gray-400 mt-1">
+            Used for WebSocket challenge-response authentication
+          </p>
         </div>
       </div>
       <div className="flex gap-2">
-        <Button onClick={handleSave} disabled={!url || !token}>
-          <Check className="w-4 h-4 mr-2" />
-          Connect
+        <Button onClick={handleSave} disabled={!url || testing}>
+          {testing ? (
+            <>
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+                className="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full"
+              />
+              Testing…
+            </>
+          ) : (
+            <>
+              <Check className="w-4 h-4 mr-2" />
+              Save & Connect
+            </>
+          )}
         </Button>
         {gatewayUrl && (
           <Button variant="ghost" onClick={() => setIsEditing(false)}>
@@ -253,11 +308,11 @@ export function SettingsView() {
       </SettingSection>
 
       {/* Connection */}
-      <SettingSection title="Connection">
+      <SettingSection title="Gateway Connection">
         <GatewayConfig />
       </SettingSection>
 
-      {/* Notifications */}
+      {/* Preferences */}
       <SettingSection title="Preferences">
         <SettingRow
           icon={Bell}
@@ -273,13 +328,13 @@ export function SettingsView() {
         />
       </SettingSection>
 
-      {/* Help */}
+      {/* Support */}
       <SettingSection title="Support">
         <SettingRow
           icon={HelpCircle}
           title="Help & Documentation"
           description="Learn how to use OpenClaw"
-          onClick={() => {}}
+          onClick={() => window.open("https://docs.openclaw.ai", "_blank")}
           trailing={<ExternalLink className="w-4 h-4 text-gray-400" />}
         />
       </SettingSection>

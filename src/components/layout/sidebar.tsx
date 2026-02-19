@@ -1,15 +1,17 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { MessageCircle, Sparkles, Radio, Settings } from "lucide-react";
+import { MessageCircle, Sparkles, Radio, Settings, Clock, Bot } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useAppStore } from "@/stores/app-store";
+import { useAppStore, type TabId } from "@/stores/app-store";
 
-const tabs = [
-  { id: "chat" as const, icon: MessageCircle, label: "Chat" },
-  { id: "skills" as const, icon: Sparkles, label: "Skills" },
-  { id: "channels" as const, icon: Radio, label: "Channels" },
-  { id: "settings" as const, icon: Settings, label: "Settings" },
+const tabs: { id: TabId; icon: typeof MessageCircle; label: string }[] = [
+  { id: "chat", icon: MessageCircle, label: "Chat" },
+  { id: "skills", icon: Sparkles, label: "Skills" },
+  { id: "channels", icon: Radio, label: "Channels" },
+  { id: "cron", icon: Clock, label: "Cron Jobs" },
+  { id: "agents", icon: Bot, label: "Agents" },
+  { id: "settings", icon: Settings, label: "Settings" },
 ];
 
 export function Sidebar() {
@@ -75,7 +77,10 @@ export function Sidebar() {
                   transition={{ type: "spring", stiffness: 500, damping: 30 }}
                 />
               )}
-              <Icon className="relative w-5 h-5" strokeWidth={isActive ? 2.5 : 2} />
+              <Icon
+                className="relative w-5 h-5"
+                strokeWidth={isActive ? 2.5 : 2}
+              />
               <span className="relative font-medium">{tab.label}</span>
             </button>
           );
@@ -84,9 +89,7 @@ export function Sidebar() {
 
       {/* Footer */}
       <div className="px-6 py-4 border-t border-gray-200/50 dark:border-gray-700/50">
-        <p className="text-xs text-gray-400">
-          OpenClaw v1.0.0
-        </p>
+        <p className="text-xs text-gray-400">OpenClaw v1.0.0</p>
       </div>
     </aside>
   );

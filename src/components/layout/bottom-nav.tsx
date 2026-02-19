@@ -1,15 +1,17 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { MessageCircle, Sparkles, Radio, Settings } from "lucide-react";
+import { MessageCircle, Sparkles, Clock, Bot, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useAppStore } from "@/stores/app-store";
+import { useAppStore, type TabId } from "@/stores/app-store";
 
-const tabs = [
-  { id: "chat" as const, icon: MessageCircle, label: "Chat" },
-  { id: "skills" as const, icon: Sparkles, label: "Skills" },
-  { id: "channels" as const, icon: Radio, label: "Channels" },
-  { id: "settings" as const, icon: Settings, label: "Settings" },
+// Mobile bottom nav shows 5 most important tabs (channels accessible from sidebar on desktop)
+const tabs: { id: TabId; icon: typeof MessageCircle; label: string }[] = [
+  { id: "chat", icon: MessageCircle, label: "Chat" },
+  { id: "skills", icon: Sparkles, label: "Skills" },
+  { id: "cron", icon: Clock, label: "Cron" },
+  { id: "agents", icon: Bot, label: "Agents" },
+  { id: "settings", icon: Settings, label: "Settings" },
 ];
 
 export function BottomNav() {
@@ -49,7 +51,10 @@ export function BottomNav() {
                   transition={{ type: "spring", stiffness: 500, damping: 30 }}
                 />
               )}
-              <Icon className="w-6 h-6" strokeWidth={isActive ? 2.5 : 2} />
+              <Icon
+                className="w-6 h-6"
+                strokeWidth={isActive ? 2.5 : 2}
+              />
               <span className="text-[10px] mt-1 font-medium">{tab.label}</span>
             </button>
           );
