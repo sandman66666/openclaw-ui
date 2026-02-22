@@ -1,21 +1,28 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { MessageCircle, Sparkles, Radio, Settings, Clock, Bot } from "lucide-react";
+import { MessageCircle, CheckSquare, Clock, Smartphone, Radio, Brain, Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAppStore, type TabId } from "@/stores/app-store";
+import { useBrowserMode } from "@/hooks/use-browser-mode";
 
-const tabs: { id: TabId; icon: typeof MessageCircle; label: string }[] = [
-  { id: "chat", icon: MessageCircle, label: "Chat" },
-  { id: "skills", icon: Sparkles, label: "Skills" },
+const baseTabs: { id: TabId; icon: typeof MessageCircle; label: string }[] = [
+  { id: "chats", icon: MessageCircle, label: "Chats" },
+  { id: "tasks", icon: CheckSquare, label: "Tasks" },
+  { id: "cron", icon: Clock, label: "Schedule" },
+  { id: "whatsapp", icon: Smartphone, label: "WhatsApp" },
   { id: "channels", icon: Radio, label: "Channels" },
-  { id: "cron", icon: Clock, label: "Cron Jobs" },
-  { id: "agents", icon: Bot, label: "Agents" },
-  { id: "settings", icon: Settings, label: "Settings" },
+  { id: "memory", icon: Brain, label: "Memory" },
 ];
+
+const browserTab = { id: "browser" as TabId, icon: Globe, label: "Navigator" };
 
 export function Sidebar() {
   const { activeTab, setActiveTab, connected } = useAppStore();
+  const { isBrowser } = useBrowserMode();
+
+  // When in Navigator browser, add the Browser tab at the top
+  const tabs = isBrowser ? [browserTab, ...baseTabs] : baseTabs;
 
   return (
     <aside

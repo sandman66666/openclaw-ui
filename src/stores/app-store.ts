@@ -8,6 +8,18 @@ export interface Message {
   timestamp: Date;
 }
 
+export interface ChatThread {
+  id: string;
+  agentId: string;
+  agentModel: string;
+  name: string;
+  messages: Message[];
+  skills: string[];
+  systemPrompt?: string;
+  isTyping: boolean;
+  input: string;
+}
+
 export interface Skill {
   id: string;
   name: string;
@@ -75,7 +87,7 @@ export interface Agent {
   heartbeat: Record<string, any>;
 }
 
-export type TabId = "chat" | "skills" | "channels" | "cron" | "agents" | "settings";
+export type TabId = "chats" | "tasks" | "cron" | "whatsapp" | "channels" | "memory" | "merlin" | "browser";
 
 interface AppState {
   // Theme
@@ -90,12 +102,13 @@ interface AppState {
   setGatewayConfig: (url: string, token: string, password?: string) => void;
   setConnected: (connected: boolean) => void;
 
-  // Chat
-  messages: Message[];
-  isTyping: boolean;
-  addMessage: (message: Message) => void;
-  setIsTyping: (typing: boolean) => void;
-  clearMessages: () => void;
+  // Chat threads
+  threads: ChatThread[];
+  activeThreadId: string | null;
+  addThread: (thread: ChatThread) => void;
+  updateThread: (id: string, updates: Partial<ChatThread>) => void;
+  setActiveThread: (id: string | null) => void;
+  removeThread: (id: string) => void;
 
   // Skills
   skills: Skill[];
@@ -140,13 +153,23 @@ export const useAppStore = create<AppState>()(
         set({ gatewayUrl: url, gatewayToken: token, ...(password !== undefined && { gatewayPassword: password }) }),
       setConnected: (connected) => set({ connected }),
 
-      // Chat
-      messages: [],
-      isTyping: false,
-      addMessage: (message) =>
-        set((state) => ({ messages: [...state.messages, message] })),
-      setIsTyping: (isTyping) => set({ isTyping }),
-      clearMessages: () => set({ messages: [] }),
+      // Chat threads
+      threads: [],
+      activeThreadId: null,
+      addThread: (thread) =>
+        set((state) => ({ threads: [...state.threads, thread], activeThreadId: thread.id })),
+      updateThread: (id, updates) =>
+        set((state) => ({
+          threads: state.threads.map((t) => (t.id === id ? { ...t, ...updates } : t)),
+        })),
+      setActiveThread: (activeThreadId) => set({ activeThreadId }),
+      removeThread: (id) =>
+        set((state) => ({
+          threads: state.threads.filter((t) => t.id !== id),
+          activeThreadId: state.activeThreadId === id
+            ? (state.threads.find((t) => t.id !== id)?.id ?? null)
+            : state.activeThreadId,
+        })),
 
       // Skills (start empty, load from API)
       skills: [],
@@ -177,7 +200,7 @@ export const useAppStore = create<AppState>()(
       setAgents: (agents) => set({ agents }),
 
       // Navigation
-      activeTab: "chat",
+      activeTab: "chats",
       setActiveTab: (activeTab) => set({ activeTab }),
 
       // Loading
@@ -193,6 +216,8 @@ export const useAppStore = create<AppState>()(
         gatewayToken: state.gatewayToken,
         gatewayPassword: state.gatewayPassword,
         activeTab: state.activeTab,
+        threads: state.threads,
+        activeThreadId: state.activeThreadId,
       }),
     }
   )
