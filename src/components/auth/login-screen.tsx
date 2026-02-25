@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Lock, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { setStoredToken } from "@/lib/auth";
+import { apiUrl } from "@/lib/config";
 
 interface LoginScreenProps {
   onSuccess: (token: string) => void;
@@ -20,7 +21,7 @@ export function LoginScreen({ onSuccess }: LoginScreenProps) {
 
   // Check if password is configured
   useEffect(() => {
-    fetch("/api/auth")
+    fetch(apiUrl("/api/auth"))
       .then((r) => r.json())
       .then((data) => setIsSetup(!data.configured))
       .catch(() => setIsSetup(false)); // assume configured on error
@@ -44,7 +45,7 @@ export function LoginScreen({ onSuccess }: LoginScreenProps) {
     setError(null);
 
     try {
-      const res = await fetch("/api/auth", {
+      const res = await fetch(apiUrl("/api/auth"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password }),

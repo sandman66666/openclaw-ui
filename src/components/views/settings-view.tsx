@@ -19,6 +19,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useAppStore } from "@/stores/app-store";
+import { apiUrl } from "@/lib/config";
 
 function SettingRow({
   icon: Icon,
@@ -164,7 +165,7 @@ function GatewayConfig() {
     setTesting(true);
     // Test the connection by hitting an API route
     try {
-      const res = await fetch("/api/skills");
+      const res = await fetch(apiUrl("/api/skills"));
       if (res.ok) {
         setConnected(true);
       }
@@ -291,7 +292,7 @@ function LogoutRow() {
   const handleLogout = async () => {
     try {
       // Signal the server (fire-and-forget — server is stateless)
-      await fetch("/api/auth", { method: "DELETE" });
+      await fetch(apiUrl("/api/auth"), { method: "DELETE" });
     } catch {
       // Ignore network errors; client logout always proceeds
     }

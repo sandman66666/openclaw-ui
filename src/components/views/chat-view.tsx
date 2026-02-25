@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Send, Mic, Paperclip, StopCircle, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAppStore, type Message } from "@/stores/app-store";
+import { apiUrl } from "@/lib/config";
 
 function MessageBubble({ message }: { message: Message }) {
   const isUser = message.role === "user";
@@ -104,7 +105,7 @@ export function ChatView() {
     setIsTyping(true);
 
     try {
-      const res = await fetch("/api/chat", {
+      const res = await fetch(apiUrl("/api/chat"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: prompt }),

@@ -2,6 +2,7 @@
 
 import { useEffect, useCallback } from "react";
 import { useAppStore } from "@/stores/app-store";
+import { apiUrl } from "@/lib/config";
 
 export function useDataLoader() {
   const { setSkills, setChannels, setCronJobs, setAgents, setConnected, setLoading } =
@@ -10,7 +11,7 @@ export function useDataLoader() {
   const loadSkills = useCallback(async () => {
     setLoading("skills", true);
     try {
-      const res = await fetch("/api/skills");
+      const res = await fetch(apiUrl("/api/skills"));
       const data = await res.json();
       if (data.skills) {
         setSkills(
@@ -35,7 +36,7 @@ export function useDataLoader() {
   const loadChannels = useCallback(async () => {
     setLoading("channels", true);
     try {
-      const res = await fetch("/api/channels");
+      const res = await fetch(apiUrl("/api/channels"));
       const data = await res.json();
       if (data.channels) {
         setChannels(data.channels);
@@ -50,7 +51,7 @@ export function useDataLoader() {
   const loadCronJobs = useCallback(async () => {
     setLoading("cron", true);
     try {
-      const res = await fetch("/api/cron");
+      const res = await fetch(apiUrl("/api/cron"));
       const data = await res.json();
       if (data.jobs) {
         setCronJobs(data.jobs);
@@ -64,7 +65,7 @@ export function useDataLoader() {
   const loadAgents = useCallback(async () => {
     setLoading("agents", true);
     try {
-      const res = await fetch("/api/agents");
+      const res = await fetch(apiUrl("/api/agents"));
       const data = await res.json();
       if (data.agents) {
         setAgents(data.agents);
