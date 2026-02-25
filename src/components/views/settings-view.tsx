@@ -14,6 +14,7 @@ import {
   ExternalLink,
   Wifi,
   WifiOff,
+  LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -284,6 +285,47 @@ function GatewayConfig() {
   );
 }
 
+function LogoutRow() {
+  const { logout } = useAppStore();
+
+  const handleLogout = async () => {
+    try {
+      // Signal the server (fire-and-forget — server is stateless)
+      await fetch("/api/auth", { method: "DELETE" });
+    } catch {
+      // Ignore network errors; client logout always proceeds
+    }
+    logout();
+  };
+
+  return (
+    <button
+      onClick={handleLogout}
+      className={cn(
+        "w-full flex items-center gap-4 p-4 text-left",
+        "transition-colors duration-200",
+        "hover:bg-red-50 dark:hover:bg-red-500/10 active:bg-red-100 dark:active:bg-red-500/20"
+      )}
+    >
+      <div
+        className={cn(
+          "w-10 h-10 rounded-xl flex items-center justify-center",
+          "bg-red-50 dark:bg-red-500/10",
+          "text-red-500"
+        )}
+      >
+        <LogOut className="w-5 h-5" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <h3 className="font-medium text-red-500">Sign Out</h3>
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          Remove saved credentials from this device
+        </p>
+      </div>
+    </button>
+  );
+}
+
 export function SettingsView() {
   return (
     <div className="px-4 py-6 space-y-6">
@@ -339,10 +381,15 @@ export function SettingsView() {
         />
       </SettingSection>
 
+      {/* Account */}
+      <SettingSection title="Account">
+        <LogoutRow />
+      </SettingSection>
+
       {/* Version */}
       <div className="text-center pt-4">
         <p className="text-sm text-gray-400">OpenClaw UI v1.0.0</p>
-        <p className="text-xs text-gray-400 mt-1">Made with ❤️ for simplicity</p>
+        <p className="text-xs text-gray-400 mt-1">Made with love for simplicity</p>
       </div>
     </div>
   );

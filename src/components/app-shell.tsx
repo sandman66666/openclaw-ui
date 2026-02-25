@@ -3,8 +3,9 @@
 import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { useAppStore } from "@/stores/app-store";
+import { useAppStore, hydrateAuthFromStorage } from "@/stores/app-store";
 import { useDataLoader } from "@/hooks/use-data";
+import { LoginScreen } from "./auth/login-screen";
 import { Header } from "./layout/header";
 import { Sidebar } from "./layout/sidebar";
 import { BottomNav } from "./layout/bottom-nav";
@@ -22,7 +23,12 @@ const pageVariants = {
 };
 
 export function AppShell() {
-  const { activeTab, theme } = useAppStore();
+  const { activeTab, theme, isAuthenticated, login } = useAppStore();
+
+  // Sync auth token from localStorage into zustand on first render
+  useEffect(() => {
+    hydrateAuthFromStorage();
+  }, []);
 
   // Load real data from API
   useDataLoader();
@@ -44,6 +50,11 @@ export function AppShell() {
       root.classList.toggle("dark", theme === "dark");
     }
   }, [theme]);
+
+  // Show login gate if not authenticated
+  if (!isAuthenticated) {
+    return <LoginScreen onSuccess={(token) => login(token)} />;
+  }
 
   const renderView = () => {
     switch (activeTab) {

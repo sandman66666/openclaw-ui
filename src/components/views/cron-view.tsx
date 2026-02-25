@@ -121,7 +121,7 @@ function CronJobCard({ job }: { job: CronJob }) {
 
         {/* Message preview */}
         <div className="text-xs text-gray-400 dark:text-gray-500 truncate">
-          {(job.payload.message || job.payload.text || "").slice(0, 120)}…
+          {(job.payload.message || "").slice(0, 120)}…
         </div>
       </div>
     </motion.div>

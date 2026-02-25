@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { getStoredToken, setStoredToken, clearStoredToken } from "@/lib/auth";
 
 export interface Message {
   id: string;
@@ -78,6 +79,12 @@ export interface Agent {
 export type TabId = "chat" | "skills" | "channels" | "cron" | "agents" | "settings";
 
 interface AppState {
+  // Auth
+  isAuthenticated: boolean;
+  authToken: string | null;
+  login: (token: string) => void;
+  logout: () => void;
+
   // Theme
   theme: "light" | "dark" | "system";
   setTheme: (theme: "light" | "dark" | "system") => void;
@@ -127,6 +134,19 @@ interface AppState {
 export const useAppStore = create<AppState>()(
   persist(
     (set) => ({
+      // Auth — token is kept in localStorage via getStoredToken/setStoredToken,
+      // but we mirror the authenticated state in the store for reactive rendering.
+      isAuthenticated: false,
+      authToken: null,
+      login: (token: string) => {
+        setStoredToken(token);
+        set({ isAuthenticated: true, authToken: token });
+      },
+      logout: () => {
+        clearStoredToken();
+        set({ isAuthenticated: false, authToken: null });
+      },
+
       // Theme
       theme: "system",
       setTheme: (theme) => set({ theme }),
@@ -193,7 +213,20 @@ export const useAppStore = create<AppState>()(
         gatewayToken: state.gatewayToken,
         gatewayPassword: state.gatewayPassword,
         activeTab: state.activeTab,
+        // Do NOT persist isAuthenticated or authToken here —
+        // we re-derive auth from localStorage on mount in AppShell.
       }),
     }
   )
 );
+
+/**
+ * Call this once on client mount to sync the auth token from localStorage
+ * into the store. Used in AppShell after hydration.
+ */
+export function hydrateAuthFromStorage(): void {
+  const token = getStoredToken();
+  if (token) {
+    useAppStore.setState({ isAuthenticated: true, authToken: token });
+  }
+}
