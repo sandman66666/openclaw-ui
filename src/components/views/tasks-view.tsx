@@ -37,10 +37,12 @@ function TaskItem({
       style={{
         background: "var(--bg-card)",
         borderBottom: "1px solid var(--border-subtle)",
+        opacity: isDone ? 0.6 : 1,
       }}
       onMouseEnter={(e) => { e.currentTarget.style.background = "var(--bg-card-hover)"; }}
       onMouseLeave={(e) => { e.currentTarget.style.background = "var(--bg-card)"; }}
     >
+      {/* Custom checkbox — 18×18, 4px radius, subtle unchecked */}
       <button
         disabled={loading}
         onClick={async () => {
@@ -48,10 +50,11 @@ function TaskItem({
           await onToggle(task.id, !isDone);
           setLoading(false);
         }}
-        className="w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-colors"
+        className="w-[18px] h-[18px] rounded flex items-center justify-center shrink-0 transition-all duration-150"
         style={{
-          borderColor: isDone ? "var(--accent-green)" : "var(--border-default)",
+          border: `2px solid ${isDone ? "var(--accent-green)" : "var(--border-default)"}`,
           background: isDone ? "var(--accent-green)" : "transparent",
+          borderRadius: "4px",
         }}
       >
         {loading ? (
@@ -77,6 +80,7 @@ function TaskItem({
         </span>
       )}
 
+      {/* Trash — visible only on hover */}
       <button
         onClick={() => onDelete(task.id)}
         className="p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-all shrink-0"
@@ -171,8 +175,9 @@ export function TasksView() {
   const doneTasks = tasks.filter((t) => t.status === "Done" || t.status === "done" || t.status === "Complete");
 
   return (
-    <div className="max-w-[800px] mx-auto px-8 pt-6 pb-8 space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="flex flex-col h-full max-w-[800px] mx-auto px-8">
+      {/* Header */}
+      <div className="flex items-center justify-between pt-6 pb-4">
         <div>
           <h2 className="text-2xl font-semibold" style={{ color: "var(--text-primary)" }}>Tasks</h2>
           <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
@@ -183,84 +188,97 @@ export function TasksView() {
           onClick={() => { setLoading(true); loadTasks(); }}
           className="p-2 rounded-lg transition-colors"
           style={{ color: "var(--text-muted)" }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = "var(--bg-elevated)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
         >
           <RefreshCw className={cn("w-4 h-4", loading && "animate-spin")} />
         </button>
       </div>
 
-      {/* Add task bar */}
+      {/* Sticky add task bar */}
       <div
-        className="flex items-center gap-2 p-3 rounded-lg border"
-        style={{ background: "var(--bg-card)", borderColor: "var(--border-default)" }}
+        className="sticky top-0 z-10 pb-4"
+        style={{ background: "var(--bg-surface, var(--bg-base))" }}
       >
-        <input
-          className="flex-1 px-3 py-2 rounded-lg text-sm border-0 focus:outline-none focus:ring-2"
-          style={{
-            background: "var(--bg-input)",
-            color: "var(--text-primary)",
-            "--tw-ring-color": "rgba(232, 69, 60, 0.15)",
-          } as React.CSSProperties}
-          value={newTitle}
-          onChange={(e) => setNewTitle(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Add a task..."
-        />
-        <input
-          type="date"
-          className="w-36 shrink-0 px-3 py-2 rounded-lg text-sm border-0 focus:outline-none focus:ring-2"
-          style={{
-            background: "var(--bg-input)",
-            color: "var(--text-primary)",
-            colorScheme: "dark",
-          }}
-          value={newDate}
-          onChange={(e) => setNewDate(e.target.value)}
-        />
-        <button
-          onClick={handleAdd}
-          disabled={adding || !newTitle.trim()}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold shrink-0 transition-colors disabled:opacity-40"
-          style={{
-            background: "var(--accent-primary)",
-            color: "var(--text-on-accent)",
-          }}
+        <div
+          className="flex items-center gap-2 p-3 rounded-lg border"
+          style={{ background: "var(--bg-card)", borderColor: "var(--border-default)" }}
         >
-          {adding ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
-          Add
-        </button>
+          <input
+            className="flex-1 px-3 py-2 rounded-lg text-sm border focus:outline-none"
+            style={{
+              background: "var(--bg-input)",
+              color: "var(--text-primary)",
+              borderColor: "var(--border-default)",
+            }}
+            value={newTitle}
+            onChange={(e) => setNewTitle(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Add a task..."
+          />
+          <input
+            type="date"
+            className="w-36 shrink-0 px-3 py-2 rounded-lg text-sm border focus:outline-none"
+            style={{
+              background: "var(--bg-input)",
+              color: "var(--text-primary)",
+              borderColor: "var(--border-default)",
+              colorScheme: "dark",
+            }}
+            value={newDate}
+            onChange={(e) => setNewDate(e.target.value)}
+          />
+          <button
+            onClick={handleAdd}
+            disabled={adding || !newTitle.trim()}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold shrink-0 transition-colors disabled:opacity-40"
+            style={{
+              background: "var(--accent-primary)",
+              color: "var(--text-on-accent)",
+            }}
+            onMouseEnter={(e) => { if (!adding && newTitle.trim()) e.currentTarget.style.background = "var(--accent-primary-hover)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = "var(--accent-primary)"; }}
+          >
+            {adding ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+            Add
+          </button>
+        </div>
       </div>
 
-      {/* Task list */}
-      <div className="rounded-lg overflow-hidden border" style={{ borderColor: "var(--border-default)" }}>
-        <AnimatePresence mode="popLayout">
-          {todoTasks.map((task) => (
-            <TaskItem key={task.id} task={task} onToggle={handleToggle} onDelete={handleDelete} />
-          ))}
-        </AnimatePresence>
-        {todoTasks.length === 0 && !loading && doneTasks.length === 0 && (
-          <div className="text-center py-16">
-            <CheckSquare className="w-12 h-12 mx-auto mb-3" style={{ color: "var(--text-muted)" }} />
-            <p style={{ color: "var(--text-secondary)" }}>No tasks yet</p>
-            <p className="text-sm mt-1" style={{ color: "var(--text-muted)" }}>Add your first task above</p>
+      {/* Scrollable task list */}
+      <div className="flex-1 overflow-y-auto pb-8 space-y-6">
+        {/* Active tasks */}
+        <div className="rounded-lg overflow-hidden border" style={{ borderColor: "var(--border-default)" }}>
+          <AnimatePresence mode="popLayout">
+            {todoTasks.map((task) => (
+              <TaskItem key={task.id} task={task} onToggle={handleToggle} onDelete={handleDelete} />
+            ))}
+          </AnimatePresence>
+          {todoTasks.length === 0 && !loading && doneTasks.length === 0 && (
+            <div className="text-center py-16" style={{ background: "var(--bg-card)" }}>
+              <CheckSquare className="w-12 h-12 mx-auto mb-3" style={{ color: "var(--text-muted)" }} />
+              <p style={{ color: "var(--text-secondary)" }}>No tasks yet</p>
+              <p className="text-sm mt-1" style={{ color: "var(--text-muted)" }}>Add your first task above</p>
+            </div>
+          )}
+        </div>
+
+        {/* Completed section */}
+        {doneTasks.length > 0 && (
+          <div className="space-y-2">
+            <h3 className="text-xs font-semibold uppercase tracking-wider pt-2" style={{ color: "var(--text-muted)" }}>
+              Completed
+            </h3>
+            <div className="rounded-lg overflow-hidden border" style={{ borderColor: "var(--border-default)" }}>
+              <AnimatePresence mode="popLayout">
+                {doneTasks.map((task) => (
+                  <TaskItem key={task.id} task={task} onToggle={handleToggle} onDelete={handleDelete} />
+                ))}
+              </AnimatePresence>
+            </div>
           </div>
         )}
       </div>
-
-      {/* Done section */}
-      {doneTasks.length > 0 && (
-        <div className="space-y-2">
-          <h3 className="text-xs font-semibold uppercase tracking-wider pt-2" style={{ color: "var(--text-muted)" }}>
-            Completed
-          </h3>
-          <div className="rounded-lg overflow-hidden border" style={{ borderColor: "var(--border-default)" }}>
-            <AnimatePresence mode="popLayout">
-              {doneTasks.map((task) => (
-                <TaskItem key={task.id} task={task} onToggle={handleToggle} onDelete={handleDelete} />
-              ))}
-            </AnimatePresence>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

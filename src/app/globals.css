@@ -117,3 +117,71 @@ select option {
   background: var(--bg-elevated);
   color: var(--text-primary);
 }
+
+/* Custom checkbox — dark, 18×18, 4px radius */
+input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--border-default);
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+  transition: background-color 150ms ease, border-color 150ms ease;
+}
+input[type="checkbox"]:checked {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+}
+input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 6px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+input[type="checkbox"]:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(232, 69, 60, 0.2);
+}
+
+/* Custom date input — no browser chrome */
+input[type="date"] {
+  color-scheme: dark;
+}
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.5);
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 150ms ease;
+}
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+/* Input focus state — red glow */
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--border-focus) !important;
+  box-shadow: 0 0 0 3px rgba(232, 69, 60, 0.15) !important;
+  outline: none !important;
+}
+
+/* Primary button hover */
+button[data-accent="primary"]:hover:not(:disabled) {
+  background: var(--accent-primary-hover) !important;
+}
+
+/* Placeholder styling */
+::placeholder {
+  color: var(--text-muted);
+  opacity: 1;
+}

@@ -4,8 +4,17 @@ import { useAppStore } from "@/stores/app-store";
 
 const titles: Record<string, { title: string; subtitle: string }> = {
   chat: { title: "Chat", subtitle: "Talk to your assistant" },
+  chats: { title: "Threads", subtitle: "Multi-agent conversations" },
+  tasks: { title: "Tasks", subtitle: "Track your to-dos" },
   skills: { title: "Skills", subtitle: "Manage capabilities" },
+  agents: { title: "Agents", subtitle: "AI agent management" },
+  merlin: { title: "Merlin", subtitle: "Agents & skills from merlin.build" },
   channels: { title: "Channels", subtitle: "Connect your apps" },
+  whatsapp: { title: "WhatsApp", subtitle: "WhatsApp integration" },
+  sessions: { title: "Sessions", subtitle: "Active conversations" },
+  memory: { title: "Memory", subtitle: "Agent memory & logs" },
+  nodes: { title: "Nodes", subtitle: "Paired devices" },
+  cron: { title: "Cron Jobs", subtitle: "Scheduled tasks" },
   settings: { title: "Settings", subtitle: "Configure OpenClaw" },
 };
 

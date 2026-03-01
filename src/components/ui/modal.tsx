@@ -13,12 +13,15 @@ const ModalContent = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & { title: string; description?: string }
 >(({ className, children, title, description, ...props }, ref) => (
   <DialogPrimitive.Portal>
-    <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
+    <DialogPrimitive.Overlay
+      className="fixed inset-0 z-50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
+      style={{ background: "rgba(0, 0, 0, 0.6)", backdropFilter: "blur(4px)" }}
+    />
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
         "fixed left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2",
-        "rounded-2xl bg-white dark:bg-gray-900 shadow-2xl border border-gray-200/50 dark:border-gray-700/50",
+        "rounded-2xl shadow-2xl",
         "data-[state=open]:animate-in data-[state=closed]:animate-out",
         "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
         "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
@@ -27,20 +30,41 @@ const ModalContent = React.forwardRef<
         "duration-200 max-h-[85vh] overflow-y-auto",
         className
       )}
+      style={{
+        background: "var(--bg-card)",
+        border: "1px solid var(--border-default)",
+      }}
       {...props}
     >
       <div className="flex items-center justify-between p-6 pb-4">
         <div>
-          <DialogPrimitive.Title className="text-lg font-semibold text-gray-900 dark:text-white">
+          <DialogPrimitive.Title
+            className="text-lg font-semibold"
+            style={{ color: "var(--text-primary)" }}
+          >
             {title}
           </DialogPrimitive.Title>
           {description && (
-            <DialogPrimitive.Description className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            <DialogPrimitive.Description
+              className="text-sm mt-1"
+              style={{ color: "var(--text-secondary)" }}
+            >
               {description}
             </DialogPrimitive.Description>
           )}
         </div>
-        <DialogPrimitive.Close className="rounded-lg p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+        <DialogPrimitive.Close
+          className="rounded-lg p-2 transition-colors"
+          style={{ color: "var(--text-muted)" }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "var(--bg-elevated)";
+            e.currentTarget.style.color = "var(--text-secondary)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "transparent";
+            e.currentTarget.style.color = "var(--text-muted)";
+          }}
+        >
           <X className="w-5 h-5" />
         </DialogPrimitive.Close>
       </div>

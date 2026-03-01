@@ -551,6 +551,8 @@ export function AgentsView() {
               background: "var(--accent-primary)",
               color: "var(--text-on-accent)",
             }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = "var(--accent-primary-hover)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = "var(--accent-primary)"; }}
           >
             <Plus className="w-4 h-4" />
             Create Agent

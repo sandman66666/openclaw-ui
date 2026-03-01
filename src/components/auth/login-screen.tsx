@@ -131,13 +131,12 @@ export function LoginScreen({ onSuccess }: LoginScreenProps) {
               placeholder={isSetup ? "Choose a password" : "Password"}
               autoFocus
               autoComplete={isSetup ? "new-password" : "current-password"}
-              className="w-full pl-11 pr-4 py-3.5 rounded-lg border transition-colors duration-200 focus:outline-none focus:ring-2"
+              className="w-full pl-11 pr-4 py-3.5 rounded-lg border transition-colors duration-200 focus:outline-none"
               style={{
                 background: "var(--bg-card)",
                 color: "var(--text-primary)",
                 borderColor: error ? "rgba(239, 68, 68, 0.5)" : "var(--border-default)",
-                "--tw-ring-color": error ? "rgba(239, 68, 68, 0.2)" : "rgba(232, 69, 60, 0.2)",
-              } as React.CSSProperties}
+              }}
             />
           </div>
 
@@ -156,13 +155,12 @@ export function LoginScreen({ onSuccess }: LoginScreenProps) {
                 }}
                 placeholder="Confirm password"
                 autoComplete="new-password"
-                className="w-full pl-11 pr-4 py-3.5 rounded-lg border transition-colors duration-200 focus:outline-none focus:ring-2"
+                className="w-full pl-11 pr-4 py-3.5 rounded-lg border transition-colors duration-200 focus:outline-none"
                 style={{
                   background: "var(--bg-card)",
                   color: "var(--text-primary)",
                   borderColor: error ? "rgba(239, 68, 68, 0.5)" : "var(--border-default)",
-                  "--tw-ring-color": error ? "rgba(239, 68, 68, 0.2)" : "rgba(232, 69, 60, 0.2)",
-                } as React.CSSProperties}
+                }}
               />
             </div>
           )}
@@ -191,6 +189,8 @@ export function LoginScreen({ onSuccess }: LoginScreenProps) {
               background: "var(--accent-primary)",
               color: "var(--text-on-accent)",
             }}
+            onMouseEnter={(e) => { if (!loading) e.currentTarget.style.background = "var(--accent-primary-hover)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = "var(--accent-primary)"; }}
           >
             {loading
               ? isSetup

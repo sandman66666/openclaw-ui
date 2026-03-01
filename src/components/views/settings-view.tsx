@@ -264,6 +264,8 @@ function GatewayConfig() {
           disabled={!url || testing}
           className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-40"
           style={{ background: "var(--accent-primary)", color: "var(--text-on-accent)" }}
+          onMouseEnter={(e) => { if (!testing) e.currentTarget.style.background = "var(--accent-primary-hover)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = "var(--accent-primary)"; }}
         >
           {testing ? (
             <>
