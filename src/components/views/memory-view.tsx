@@ -69,7 +69,7 @@ export function MemoryView() {
       const res = await fetch(apiUrl("/api/memory"), {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ filePath, content }),
+        body: JSON.stringify({ filePath, content, isMain }),
       });
       const data = await res.json();
       if (data.ok) {

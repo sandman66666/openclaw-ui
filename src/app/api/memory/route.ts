@@ -1,25 +1,41 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getMemoryFiles, readMemoryFile, writeMemoryFile } from "@/lib/openclaw-api";
+import {
+  getMainMemory,
+  writeMainMemory,
+  getMemoryFiles,
+  readMemoryFile,
+  writeMemoryFile,
+} from "@/lib/openclaw-api";
 
 export async function GET(req: NextRequest) {
   const filePath = req.nextUrl.searchParams.get("file");
 
+  // Single daily file request
   if (filePath) {
     const content = readMemoryFile(filePath);
     return NextResponse.json({ content });
   }
 
-  const data = getMemoryFiles();
-  return NextResponse.json(data);
+  // Full memory load: main MEMORY.md + daily file list
+  const main = getMainMemory();
+  const { files } = getMemoryFiles();
+  const dailyFiles = files.map((f: string) => ({ name: f, path: f }));
+
+  return NextResponse.json({ main, dailyFiles });
 }
 
 export async function PUT(req: NextRequest) {
   const body = await req.json();
-  const { filePath, content } = body;
-  if (!filePath || content === undefined) {
-    return NextResponse.json({ error: "Missing filePath or content" }, { status: 400 });
+  const { filePath, content, isMain } = body;
+  if (content === undefined) {
+    return NextResponse.json({ error: "Missing content" }, { status: 400 });
   }
-  const result = writeMemoryFile(filePath, content);
+
+  // Save main MEMORY.md or a daily file
+  const result = isMain
+    ? writeMainMemory(content)
+    : writeMemoryFile(filePath, content);
+
   if (!result.ok) {
     return NextResponse.json({ error: result.error }, { status: 500 });
   }

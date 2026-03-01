@@ -141,13 +141,43 @@ export function getSessions() {
 }
 
 // ── Memory file helpers ─────────────────────────────────────────────────
+// OC stores memory in two places:
+//   Main file:   ~/.openclaw/workspace/MEMORY.md
+//   Daily files: ~/.openclaw/workspace/memory/ (2026-02-09.md, lessons.md, etc.)
+
+const WORKSPACE_DIR = require("path").join(
+  process.env.HOME || "~",
+  ".openclaw",
+  "workspace"
+);
+const MAIN_MEMORY_PATH = require("path").join(WORKSPACE_DIR, "MEMORY.md");
+const DAILY_MEMORY_DIR = require("path").join(WORKSPACE_DIR, "memory");
+
+export function getMainMemory(): string {
+  const fs = require("fs");
+  try {
+    return fs.readFileSync(MAIN_MEMORY_PATH, "utf-8");
+  } catch {
+    return "";
+  }
+}
+
+export function writeMainMemory(content: string): { ok: boolean; error?: string } {
+  const fs = require("fs");
+  try {
+    fs.writeFileSync(MAIN_MEMORY_PATH, content, "utf-8");
+    return { ok: true };
+  } catch (e: any) {
+    return { ok: false, error: e.message };
+  }
+}
 
 export function getMemoryFiles(): { files: string[] } {
   const fs = require("fs");
-  const path = require("path");
-  const memDir = path.join(process.env.HOME || "~", ".openclaw", "memory");
   try {
-    const files = fs.readdirSync(memDir).filter((f: string) => f.endsWith(".md") || f.endsWith(".json") || f.endsWith(".txt"));
+    const files = fs.readdirSync(DAILY_MEMORY_DIR).filter((f: string) =>
+      f.endsWith(".md") || f.endsWith(".json") || f.endsWith(".txt")
+    );
     return { files };
   } catch {
     return { files: [] };
@@ -157,10 +187,9 @@ export function getMemoryFiles(): { files: string[] } {
 export function readMemoryFile(filePath: string): string {
   const fs = require("fs");
   const path = require("path");
-  const memDir = path.join(process.env.HOME || "~", ".openclaw", "memory");
-  const resolved = path.resolve(memDir, filePath);
+  const resolved = path.resolve(DAILY_MEMORY_DIR, filePath);
   // Security: prevent path traversal
-  if (!resolved.startsWith(memDir)) return "";
+  if (!resolved.startsWith(DAILY_MEMORY_DIR)) return "";
   try {
     return fs.readFileSync(resolved, "utf-8");
   } catch {
@@ -171,11 +200,10 @@ export function readMemoryFile(filePath: string): string {
 export function writeMemoryFile(filePath: string, content: string): { ok: boolean; error?: string } {
   const fs = require("fs");
   const path = require("path");
-  const memDir = path.join(process.env.HOME || "~", ".openclaw", "memory");
-  const resolved = path.resolve(memDir, filePath);
-  if (!resolved.startsWith(memDir)) return { ok: false, error: "Invalid path" };
+  const resolved = path.resolve(DAILY_MEMORY_DIR, filePath);
+  if (!resolved.startsWith(DAILY_MEMORY_DIR)) return { ok: false, error: "Invalid path" };
   try {
-    fs.mkdirSync(memDir, { recursive: true });
+    fs.mkdirSync(DAILY_MEMORY_DIR, { recursive: true });
     fs.writeFileSync(resolved, content, "utf-8");
     return { ok: true };
   } catch (e: any) {
