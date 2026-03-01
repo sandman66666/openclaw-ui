@@ -54,27 +54,23 @@ export function getConfig() {
 
 export function getAgents() {
   const config = getConfig();
-  const agents: any[] = [];
-  
-  // Main agent is always present
-  const mainAgent = {
-    id: "main",
-    model: config?.agents?.defaults?.model?.primary || "unknown",
-    workspace: config?.agents?.defaults?.workspace || "~/.openclaw/workspace",
-    heartbeat: config?.agents?.defaults?.heartbeat || {},
-  };
-  agents.push(mainAgent);
+  const defaults = config?.agents?.defaults || {};
+  const defaultModel = defaults?.model?.primary || "unknown";
+  const defaultWorkspace = defaults?.workspace || "~/.openclaw/workspace";
+  const defaultHeartbeat = defaults?.heartbeat || {};
 
-  // Check for additional agents
-  if (config?.agents) {
-    for (const [key, value] of Object.entries(config.agents)) {
-      if (key !== "defaults" && typeof value === "object") {
-        agents.push({ id: key, ...(value as any) });
-      }
-    }
-  }
+  // agents.list is the canonical array of agents
+  const list: any[] = config?.agents?.list || [];
 
-  return agents;
+  return list.map((a: any) => ({
+    id: a.id,
+    name: a.name || a.id,
+    model: a.model || defaultModel,
+    workspace: a.workspace || defaultWorkspace,
+    heartbeat: a.heartbeat || defaultHeartbeat,
+    agentDir: a.agentDir || "",
+    skills: a.skills || [],
+  }));
 }
 
 export function getChannels() {
@@ -219,7 +215,7 @@ export function notifyNode(nodeId: string, message: string): { ok: boolean; erro
 export function sendToSession(sessionKey: string, message: string): { ok: boolean; response?: string; error?: string } {
   try {
     const escaped = message.replace(/'/g, "'\\''");
-    const raw = run(`openclaw agent --message '${escaped}' --no-stream 2>&1`);
+    const raw = run(`openclaw agent --message '${escaped}' --json 2>&1`);
     return { ok: true, response: raw };
   } catch (e: any) {
     return { ok: false, error: e.message };

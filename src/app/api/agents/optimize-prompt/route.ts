@@ -30,7 +30,7 @@ Return ONLY the optimized system prompt text, nothing else. No explanations, no 
 
     const escaped = metaPrompt.replace(/'/g, "'\\''");
     const result = execSync(
-      `openclaw agent --message '${escaped}' --no-stream 2>&1`,
+      `openclaw agent --message '${escaped}' --json 2>&1`,
       {
         encoding: "utf-8",
         timeout: 60000,
