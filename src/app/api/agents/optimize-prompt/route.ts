@@ -29,7 +29,7 @@ Optimize this system prompt. Make it:
 Return ONLY the optimized system prompt text, nothing else. No explanations, no markdown code fences.`;
 
     const escaped = metaPrompt.replace(/'/g, "'\\''");
-    const result = execSync(
+    const raw = execSync(
       `openclaw agent --agent webui --message '${escaped}' --json 2>&1`,
       {
         encoding: "utf-8",
@@ -42,7 +42,15 @@ Return ONLY the optimized system prompt text, nothing else. No explanations, no 
       }
     ).trim();
 
-    return NextResponse.json({ optimized: result });
+    // Parse JSON and extract text
+    try {
+      const data = JSON.parse(raw);
+      const payloads = data?.result?.payloads || [];
+      const text = payloads.map((p: any) => p.text).filter(Boolean).join("\n\n");
+      return NextResponse.json({ optimized: text || raw });
+    } catch {
+      return NextResponse.json({ optimized: raw });
+    }
   } catch (e: any) {
     return NextResponse.json(
       { error: e.message, optimized: null },

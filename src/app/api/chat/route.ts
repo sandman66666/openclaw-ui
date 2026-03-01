@@ -9,9 +9,8 @@ export async function POST(request: Request) {
   }
 
   try {
-    // Use openclaw agent command to send a message
     const escaped = message.replace(/'/g, "'\\''");
-    const result = execSync(
+    const raw = execSync(
       `openclaw agent --agent webui --message '${escaped}' --json 2>&1`,
       {
         encoding: "utf-8",
@@ -24,10 +23,27 @@ export async function POST(request: Request) {
       }
     ).trim();
 
-    return NextResponse.json({ response: result });
+    // Parse JSON output and extract text from payloads
+    try {
+      const data = JSON.parse(raw);
+      const payloads = data?.result?.payloads || [];
+      const text = payloads.map((p: any) => p.text).filter(Boolean).join("\n\n");
+      return NextResponse.json({ response: text || raw });
+    } catch {
+      // If not valid JSON, return raw output
+      return NextResponse.json({ response: raw });
+    }
   } catch (e: any) {
+    const stdout = e.stdout?.trim() || "";
+    // Try to parse error output too
+    try {
+      const data = JSON.parse(stdout);
+      const payloads = data?.result?.payloads || [];
+      const text = payloads.map((p: any) => p.text).filter(Boolean).join("\n\n");
+      if (text) return NextResponse.json({ response: text });
+    } catch {}
     return NextResponse.json(
-      { error: e.message, response: e.stdout || "Failed to get response" },
+      { error: e.message, response: stdout || "Failed to get response" },
       { status: 500 }
     );
   }

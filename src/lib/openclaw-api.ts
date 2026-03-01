@@ -217,6 +217,11 @@ export function sendToSession(sessionKey: string, message: string): { ok: boolea
   try {
     const escaped = message.replace(/'/g, "'\\''");
     const raw = run(`openclaw agent --agent webui --message '${escaped}' --json 2>&1`);
+    const parsed = parseJson(raw);
+    if (parsed?.result?.payloads) {
+      const text = parsed.result.payloads.map((p: any) => p.text).filter(Boolean).join("\n\n");
+      return { ok: true, response: text || raw };
+    }
     return { ok: true, response: raw };
   } catch (e: any) {
     return { ok: false, error: e.message };
