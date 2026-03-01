@@ -215,7 +215,7 @@ export function notifyNode(nodeId: string, message: string): { ok: boolean; erro
 export function sendToSession(sessionKey: string, message: string): { ok: boolean; response?: string; error?: string } {
   try {
     const escaped = message.replace(/'/g, "'\\''");
-    const raw = run(`openclaw agent --message '${escaped}' --json 2>&1`);
+    const raw = run(`openclaw agent --agent webui --message '${escaped}' --json 2>&1`);
     return { ok: true, response: raw };
   } catch (e: any) {
     return { ok: false, error: e.message };

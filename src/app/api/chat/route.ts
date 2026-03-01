@@ -12,7 +12,7 @@ export async function POST(request: Request) {
     // Use openclaw agent command to send a message
     const escaped = message.replace(/'/g, "'\\''");
     const result = execSync(
-      `openclaw agent --message '${escaped}' --json 2>&1`,
+      `openclaw agent --agent webui --message '${escaped}' --json 2>&1`,
       {
         encoding: "utf-8",
         timeout: 120000,
