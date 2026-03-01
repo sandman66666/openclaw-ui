@@ -6,6 +6,7 @@ import {
   Monitor, Wifi, WifiOff, Bell, RefreshCw, Loader2, Send,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { apiUrl } from "@/lib/config";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
 
@@ -48,7 +49,7 @@ function NodeCard({ node }: { node: Node }) {
     if (!message.trim() || sending) return;
     setSending(true);
     try {
-      const res = await fetch("/api/nodes", {
+      const res = await fetch(apiUrl("/api/nodes"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ nodeName, message: message.trim() }),
@@ -169,7 +170,7 @@ export function NodesView() {
   const loadNodes = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/nodes");
+      const res = await fetch(apiUrl("/api/nodes"));
       const data = await res.json();
       setNodes(data.nodes ?? []);
     } catch {

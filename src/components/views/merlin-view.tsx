@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Zap, Bot, Plus, Loader2, RefreshCw, ExternalLink, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { apiUrl } from "@/lib/config";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
 
@@ -35,7 +36,7 @@ function AgentCard({ agent }: { agent: MerlinAgent }) {
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-|-$/g, "")}`;
-      const res = await fetch("/api/agents", {
+      const res = await fetch(apiUrl("/api/agents"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -158,7 +159,7 @@ export function MerlinView() {
   const loadAgents = async () => {
     setLoadingAgents(true);
     try {
-      const res = await fetch("/api/merlin-agents");
+      const res = await fetch(apiUrl("/api/merlin-agents"));
       const data = await res.json();
       setAgents(data.agents || []);
     } catch {}
@@ -168,7 +169,7 @@ export function MerlinView() {
   const loadSkills = async () => {
     setLoadingSkills(true);
     try {
-      const res = await fetch("/api/merlin-skills");
+      const res = await fetch(apiUrl("/api/merlin-skills"));
       const data = await res.json();
       setSkills(data.skills || []);
     } catch {}

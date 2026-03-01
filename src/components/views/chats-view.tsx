@@ -6,6 +6,7 @@ import {
   Send, Trash2, Bot, Plus, MessageSquare, X, Loader2, Cloud,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { apiUrl } from "@/lib/config";
 import { useAppStore, type Message, type ChatThread } from "@/stores/app-store";
 import { Modal, ModalTrigger, ModalContent } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
@@ -76,7 +77,7 @@ function NewChatModal({ onClose }: { onClose: () => void }) {
     : [{ id: "main", model: "default", workspace: "", heartbeat: {} }];
 
   useEffect(() => {
-    fetch("/api/merlin-agents")
+    fetch(apiUrl("/api/merlin-agents"))
       .then((r) => r.json())
       .then((d) => setMerlinAgents(d.agents || []))
       .catch(() => {})
@@ -255,7 +256,7 @@ export function ChatsView() {
     });
 
     try {
-      const res = await fetch("/api/chat", {
+      const res = await fetch(apiUrl("/api/chat"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ agentId: activeThread.agentId, message: input }),

@@ -6,6 +6,7 @@ import {
   Brain, FileText, Save, RefreshCw, Loader2, ChevronRight, Edit3, Eye,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { apiUrl } from "@/lib/config";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
 
@@ -31,7 +32,7 @@ export function MemoryView() {
   const loadMemory = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/memory");
+      const res = await fetch(apiUrl("/api/memory"));
       const data = await res.json();
       setMainContent(data.main || "");
       setMainDraft(data.main || "");
@@ -53,7 +54,7 @@ export function MemoryView() {
     setSelectedFile(file);
     setFileEditing(false);
     try {
-      const res = await fetch(`/api/memory?file=${encodeURIComponent(file.path)}`);
+      const res = await fetch(apiUrl(`/api/memory?file=${encodeURIComponent(file.path)}`));
       const data = await res.json();
       setFileContent(data.content || "");
       setFileDraft(data.content || "");
@@ -65,7 +66,7 @@ export function MemoryView() {
   const saveFile = async (filePath: string, content: string, isMain: boolean) => {
     setSaving(true);
     try {
-      const res = await fetch("/api/memory", {
+      const res = await fetch(apiUrl("/api/memory"), {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ filePath, content }),

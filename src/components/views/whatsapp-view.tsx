@@ -6,6 +6,7 @@ import {
   Smartphone, Users, Plus, Trash2, Loader2, Phone, MessageSquare, BellRing, VolumeX, Edit3,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { apiUrl } from "@/lib/config";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/ui/toast";
@@ -81,7 +82,7 @@ export function WhatsAppView() {
 
   const loadData = useCallback(async () => {
     try {
-      const res = await fetch("/api/whatsapp");
+      const res = await fetch(apiUrl("/api/whatsapp"));
       const data = await res.json();
       setContacts(data.contacts || []);
       setGroups(data.groups || []);
@@ -96,7 +97,7 @@ export function WhatsAppView() {
   const saveChanges = async (newContacts?: string[], newGroups?: Group[]) => {
     setSaving(true);
     try {
-      const res = await fetch("/api/whatsapp", {
+      const res = await fetch(apiUrl("/api/whatsapp"), {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

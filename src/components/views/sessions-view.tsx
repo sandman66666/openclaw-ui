@@ -7,6 +7,7 @@ import {
   Loader2, Clock, User, Bot,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { apiUrl } from "@/lib/config";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
 
@@ -62,7 +63,7 @@ function SessionCard({
     if (!sessionKey) return;
     setLoadingHistory(true);
     try {
-      const res = await fetch(`/api/sessions/history?key=${encodeURIComponent(sessionKey)}`);
+      const res = await fetch(apiUrl(`/api/sessions/history?key=${encodeURIComponent(sessionKey)}`));
       const data = await res.json();
       setHistory(data.history ?? []);
     } catch {
@@ -79,7 +80,7 @@ function SessionCard({
     if (!message.trim() || sending) return;
     setSending(true);
     try {
-      const res = await fetch("/api/sessions/send", {
+      const res = await fetch(apiUrl("/api/sessions/send"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sessionKey, message: message.trim() }),
@@ -229,7 +230,7 @@ export function SessionsView() {
   const loadSessions = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/sessions");
+      const res = await fetch(apiUrl("/api/sessions"));
       const data = await res.json();
       setSessions(data.sessions ?? []);
     } catch {

@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, Plus, Trash2, Loader2, Calendar, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { apiUrl } from "@/lib/config";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
 
@@ -105,7 +106,7 @@ export function TasksView() {
 
   const loadTasks = useCallback(async () => {
     try {
-      const res = await fetch("/api/tasks");
+      const res = await fetch(apiUrl("/api/tasks"));
       const data = await res.json();
       if (data.tasks) setTasks(data.tasks);
     } catch (e) {
@@ -120,7 +121,7 @@ export function TasksView() {
     if (!newTitle.trim()) return;
     setAdding(true);
     try {
-      const res = await fetch("/api/tasks", {
+      const res = await fetch(apiUrl("/api/tasks"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title: newTitle.trim(), dueDate: newDate || undefined }),
@@ -142,7 +143,7 @@ export function TasksView() {
 
   const handleToggle = async (id: string, done: boolean) => {
     try {
-      const res = await fetch("/api/tasks", {
+      const res = await fetch(apiUrl("/api/tasks"), {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, status: done ? "Done" : "Not started" }),
@@ -160,7 +161,7 @@ export function TasksView() {
 
   const handleDelete = async (id: string) => {
     try {
-      const res = await fetch(`/api/tasks?id=${id}`, { method: "DELETE" });
+      const res = await fetch(apiUrl(`/api/tasks?id=${id}`), { method: "DELETE" });
       const data = await res.json();
       if (data.ok) {
         setTasks((prev) => prev.filter((t) => t.id !== id));
