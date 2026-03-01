@@ -16,6 +16,7 @@ export async function POST(request: Request) {
       {
         encoding: "utf-8",
         timeout: 120000,
+        cwd: process.env.HOME || "/tmp",
         env: {
           ...process.env,
           PATH: `/opt/homebrew/bin:/usr/local/bin:${process.env.PATH}`,

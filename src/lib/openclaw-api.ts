@@ -5,6 +5,7 @@ function run(cmd: string): string {
     return execSync(cmd, {
       encoding: "utf-8",
       timeout: 15000,
+      cwd: process.env.HOME || "/tmp",
       env: { ...process.env, PATH: `/opt/homebrew/bin:/usr/local/bin:${process.env.PATH}` },
     }).trim();
   } catch (e: any) {

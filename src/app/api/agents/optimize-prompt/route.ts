@@ -34,6 +34,7 @@ Return ONLY the optimized system prompt text, nothing else. No explanations, no 
       {
         encoding: "utf-8",
         timeout: 60000,
+        cwd: process.env.HOME || "/tmp",
         env: {
           ...process.env,
           PATH: `/opt/homebrew/bin:/usr/local/bin:${process.env.PATH}`,
