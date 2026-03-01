@@ -1,68 +1,52 @@
 /**
- * Server-side auth — password stored as HMAC hash in ~/.openclaw/ui-auth.json.
- * Only imported from API routes and proxy.ts (never from client components).
+ * Server-side auth — validates against the bridge token passed via
+ * OPENCLAW_BRIDGE_TOKEN env var. This is the same token Navigator uses
+ * to connect, so there's one credential for everything.
+ *
+ * If no bridge token is set (standalone mode), auth is disabled.
  */
 
 import crypto from "node:crypto";
-import fs from "node:fs";
-import os from "node:os";
-import path from "node:path";
 
-const AUTH_FILE_NAME = "ui-auth.json";
-const SALT = "openclaw_ui_v1";
 const TOKEN_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
+const TOKEN_SECRET_SALT = "openclaw_ui_v1";
 
-function authFilePath(): string {
-  return path.join(os.homedir(), ".openclaw", AUTH_FILE_NAME);
+function getBridgeToken(): string | null {
+  return process.env.OPENCLAW_BRIDGE_TOKEN || null;
 }
 
-function ensureDir(): void {
-  fs.mkdirSync(path.join(os.homedir(), ".openclaw"), { recursive: true });
-}
-
-function hashPassword(pw: string): string {
-  return crypto.createHmac("sha256", SALT).update(pw).digest("hex");
-}
-
-// ── Password storage ──────────────────────────────────────────────────────
-
-export function loadPasswordHash(): string | null {
-  try {
-    const raw = fs.readFileSync(authFilePath(), "utf8");
-    const data = JSON.parse(raw);
-    return typeof data.hash === "string" ? data.hash : null;
-  } catch {
-    return null;
-  }
-}
+// ── Auth check ────────────────────────────────────────────────────────────
 
 export function isPasswordConfigured(): boolean {
-  return loadPasswordHash() !== null;
-}
-
-export function savePassword(password: string): void {
-  ensureDir();
-  const data = { hash: hashPassword(password), updatedAt: Date.now() };
-  fs.writeFileSync(authFilePath(), JSON.stringify(data, null, 2) + "\n", {
-    mode: 0o600,
-  });
+  return !!getBridgeToken();
 }
 
 export function checkPassword(password: string): boolean {
-  const stored = loadPasswordHash();
-  if (!stored) return false;
-  const provided = hashPassword(password);
-  const a = Buffer.from(stored, "hex");
-  const b = Buffer.from(provided, "hex");
-  if (a.length !== b.length) return false;
-  return crypto.timingSafeEqual(a, b);
+  const bridgeToken = getBridgeToken();
+  if (!bridgeToken) return true; // no token = no auth
+  // Constant-time comparison
+  if (password.length !== bridgeToken.length) return false;
+  const a = Buffer.from(password);
+  const b = Buffer.from(bridgeToken);
+  try {
+    return crypto.timingSafeEqual(a, b);
+  } catch {
+    return false;
+  }
 }
 
-// ── Token generation / verification ──────────────────────────────────────
+// savePassword is a no-op — the bridge token IS the password
+export function savePassword(_password: string): void {
+  // Token is managed by the bridge, not the UI
+}
+
+// ── Session token generation / verification ───────────────────────────────
+// After validating the bridge token, we issue a short-lived session token
+// so the browser doesn't need to send the bridge token on every request.
 
 function buildTokenSecret(): string {
-  const hash = loadPasswordHash() ?? "none";
-  return `${SALT}_token_${hash}`;
+  const bridgeToken = getBridgeToken() ?? "none";
+  return `${TOKEN_SECRET_SALT}_token_${bridgeToken}`;
 }
 
 export function generateToken(): string {
@@ -75,6 +59,9 @@ export function generateToken(): string {
 }
 
 export function verifyToken(token: string): { valid: boolean; reason?: string } {
+  // If no bridge token configured, all requests pass
+  if (!getBridgeToken()) return { valid: true };
+
   let raw: string;
   try {
     raw = Buffer.from(token, "base64url").toString("utf8");
@@ -108,4 +95,11 @@ export function verifyToken(token: string): { valid: boolean; reason?: string } 
   } catch {
     return { valid: false, reason: "invalid" };
   }
+}
+
+// ── Legacy compatibility ──────────────────────────────────────────────────
+// These are kept for any code that still imports them
+
+export function loadPasswordHash(): string | null {
+  return getBridgeToken();
 }

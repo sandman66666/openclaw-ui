@@ -27,10 +27,11 @@ export function proxy(req: NextRequest): NextResponse {
     return NextResponse.next();
   }
 
+  // Check Authorization header first, then oc-token cookie (set by bridge auto-auth)
   const authHeader = req.headers.get("authorization") ?? "";
   const token = authHeader.startsWith("Bearer ")
     ? authHeader.slice(7).trim()
-    : null;
+    : req.cookies.get("oc-token")?.value ?? null;
 
   if (!token) {
     return NextResponse.json(
