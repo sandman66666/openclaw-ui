@@ -6,6 +6,7 @@ const NOTION_API_KEY = process.env.NOTION_API_KEY || "";
 const DATABASE_ID = process.env.NOTION_DATABASE_ID || "";
 const NOTION_BASE = "https://api.notion.com/v1";
 const OPEN_ITEMS_PATH = path.join(process.env.HOME || "", ".openclaw/workspace/memory/open-items.json");
+const HAS_NOTION = !!(NOTION_API_KEY && DATABASE_ID);
 
 const notionHeaders = {
   Authorization: `Bearer ${NOTION_API_KEY}`,
@@ -84,6 +85,12 @@ async function archiveNotionPage(notionId: string) {
 
 export async function GET() {
   try {
+    const rossItems = getRossItems();
+
+    if (!HAS_NOTION) {
+      return NextResponse.json({ tasks: rossItems });
+    }
+
     const res = await fetch(`${NOTION_BASE}/databases/${DATABASE_ID}/query`, {
       method: "POST",
       headers: notionHeaders,
@@ -102,13 +109,11 @@ export async function GET() {
         if (title.startsWith("[SH]")) return null;
         const status = page.properties?.Status?.status?.name || "Not started";
         const dueDate = page.properties?.["Due date"]?.date?.start || null;
-        // Skip items already in Ross list (they have matching notionId)
         return { id: page.id, notionId: page.id, title, status, dueDate, source: "notion" };
       })
       .filter(Boolean);
 
     // Merge: Ross items first (newest), then Notion-only items
-    const rossItems = getRossItems();
     const rossNotionIds = new Set(rossItems.map((r: any) => r.notionId).filter(Boolean));
     const notionOnly = notionTasks.filter((t: any) => !rossNotionIds.has(t.id));
     return NextResponse.json({ tasks: [...rossItems, ...notionOnly] });
@@ -124,8 +129,8 @@ export async function POST(req: NextRequest) {
     const { title, dueDate, id, emoji, priority } = await req.json();
     if (!title) return NextResponse.json({ error: "Missing title" }, { status: 400 });
 
-    // 1. Push to Notion
-    const notionId = await createNotionTask(title, dueDate);
+    // 1. Push to Notion (if configured)
+    const notionId = HAS_NOTION ? await createNotionTask(title, dueDate) : null;
 
     // 2. Add to open-items.json
     const data = loadOpenItems();
@@ -167,10 +172,10 @@ export async function PATCH(req: NextRequest) {
         item.status = notionStatus === "Done" ? "closed" : "open";
         const notionId = item.notionId;
         saveOpenItems(data);
-        // Sync to Notion
-        if (notionId) await updateNotionStatus(notionId, notionStatus);
+        // Sync to Notion (if configured)
+        if (notionId && HAS_NOTION) await updateNotionStatus(notionId, notionStatus);
       }
-    } else {
+    } else if (HAS_NOTION) {
       // Pure Notion task
       await updateNotionStatus(id, notionStatus);
     }
@@ -196,9 +201,9 @@ export async function DELETE(req: NextRequest) {
         item.status = "closed";
         const notionId = item.notionId;
         saveOpenItems(data);
-        if (notionId) await archiveNotionPage(notionId);
+        if (notionId && HAS_NOTION) await archiveNotionPage(notionId);
       }
-    } else {
+    } else if (HAS_NOTION) {
       await archiveNotionPage(id);
     }
 
