@@ -15,6 +15,13 @@ import { ChannelsView } from "./views/channels-view";
 import { SettingsView } from "./views/settings-view";
 import { CronView } from "./views/cron-view";
 import { AgentsView } from "./views/agents-view";
+import { TasksView } from "./views/tasks-view";
+import { SessionsView } from "./views/sessions-view";
+import { WhatsAppView } from "./views/whatsapp-view";
+import { MemoryView } from "./views/memory-view";
+import { MerlinView } from "./views/merlin-view";
+import { NodesView } from "./views/nodes-view";
+import { ChatsView } from "./views/chats-view";
 
 const pageVariants = {
   initial: { opacity: 0, y: 10 },
@@ -68,6 +75,20 @@ export function AppShell() {
         return <CronView />;
       case "agents":
         return <AgentsView />;
+      case "tasks":
+        return <TasksView />;
+      case "sessions":
+        return <SessionsView />;
+      case "whatsapp":
+        return <WhatsAppView />;
+      case "memory":
+        return <MemoryView />;
+      case "merlin":
+        return <MerlinView />;
+      case "nodes":
+        return <NodesView />;
+      case "chats":
+        return <ChatsView />;
       case "settings":
         return <SettingsView />;
       default:

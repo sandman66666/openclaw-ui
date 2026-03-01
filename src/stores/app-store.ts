@@ -88,7 +88,7 @@ export interface ChatThread {
   input: string;
 }
 
-export type TabId = "chat" | "skills" | "channels" | "cron" | "agents" | "settings";
+export type TabId = "chat" | "skills" | "channels" | "cron" | "agents" | "settings" | "tasks" | "sessions" | "whatsapp" | "memory" | "merlin" | "nodes" | "chats";
 
 interface AppState {
   // Auth

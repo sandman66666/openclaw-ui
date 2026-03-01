@@ -1,16 +1,26 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { MessageCircle, Sparkles, Radio, Settings, Clock, Bot } from "lucide-react";
+import {
+  MessageCircle, Sparkles, Radio, Settings, Clock, Bot,
+  CheckSquare, History, Phone, Brain, Wand2, Network, MessagesSquare,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAppStore, type TabId } from "@/stores/app-store";
 
 const tabs: { id: TabId; icon: typeof MessageCircle; label: string }[] = [
   { id: "chat", icon: MessageCircle, label: "Chat" },
+  { id: "chats", icon: MessagesSquare, label: "Threads" },
+  { id: "tasks", icon: CheckSquare, label: "Tasks" },
   { id: "skills", icon: Sparkles, label: "Skills" },
-  { id: "channels", icon: Radio, label: "Channels" },
-  { id: "cron", icon: Clock, label: "Cron Jobs" },
   { id: "agents", icon: Bot, label: "Agents" },
+  { id: "merlin", icon: Wand2, label: "Merlin" },
+  { id: "channels", icon: Radio, label: "Channels" },
+  { id: "whatsapp", icon: Phone, label: "WhatsApp" },
+  { id: "sessions", icon: History, label: "Sessions" },
+  { id: "memory", icon: Brain, label: "Memory" },
+  { id: "nodes", icon: Network, label: "Nodes" },
+  { id: "cron", icon: Clock, label: "Cron Jobs" },
   { id: "settings", icon: Settings, label: "Settings" },
 ];
 

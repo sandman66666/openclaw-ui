@@ -1,15 +1,15 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { MessageCircle, Sparkles, Clock, Bot, Settings } from "lucide-react";
+import { MessageCircle, Sparkles, Bot, CheckSquare, Settings, MoreHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAppStore, type TabId } from "@/stores/app-store";
 
-// Mobile bottom nav shows 5 most important tabs (channels accessible from sidebar on desktop)
+// Mobile bottom nav shows 5 most important tabs (full list accessible from sidebar on desktop)
 const tabs: { id: TabId; icon: typeof MessageCircle; label: string }[] = [
   { id: "chat", icon: MessageCircle, label: "Chat" },
+  { id: "tasks", icon: CheckSquare, label: "Tasks" },
   { id: "skills", icon: Sparkles, label: "Skills" },
-  { id: "cron", icon: Clock, label: "Cron" },
   { id: "agents", icon: Bot, label: "Agents" },
   { id: "settings", icon: Settings, label: "Settings" },
 ];
