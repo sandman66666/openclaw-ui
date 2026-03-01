@@ -142,3 +142,123 @@ export function getSessions() {
   const raw = run("openclaw sessions list --json 2>/dev/null || echo '[]'");
   return parseJson(raw) ?? [];
 }
+
+// ── Memory file helpers ─────────────────────────────────────────────────
+
+export function getMemoryFiles(): { files: string[] } {
+  const fs = require("fs");
+  const path = require("path");
+  const memDir = path.join(process.env.HOME || "~", ".openclaw", "memory");
+  try {
+    const files = fs.readdirSync(memDir).filter((f: string) => f.endsWith(".md") || f.endsWith(".json") || f.endsWith(".txt"));
+    return { files };
+  } catch {
+    return { files: [] };
+  }
+}
+
+export function readMemoryFile(filePath: string): string {
+  const fs = require("fs");
+  const path = require("path");
+  const memDir = path.join(process.env.HOME || "~", ".openclaw", "memory");
+  const resolved = path.resolve(memDir, filePath);
+  // Security: prevent path traversal
+  if (!resolved.startsWith(memDir)) return "";
+  try {
+    return fs.readFileSync(resolved, "utf-8");
+  } catch {
+    return "";
+  }
+}
+
+export function writeMemoryFile(filePath: string, content: string): { ok: boolean; error?: string } {
+  const fs = require("fs");
+  const path = require("path");
+  const memDir = path.join(process.env.HOME || "~", ".openclaw", "memory");
+  const resolved = path.resolve(memDir, filePath);
+  if (!resolved.startsWith(memDir)) return { ok: false, error: "Invalid path" };
+  try {
+    fs.mkdirSync(memDir, { recursive: true });
+    fs.writeFileSync(resolved, content, "utf-8");
+    return { ok: true };
+  } catch (e: any) {
+    return { ok: false, error: e.message };
+  }
+}
+
+// ── Tools ───────────────────────────────────────────────────────────────
+
+export function checkTools(): any[] {
+  const raw = run("openclaw tools list --json 2>/dev/null || echo '[]'");
+  return parseJson(raw) ?? [];
+}
+
+export function searchSkills(query: string): any[] {
+  const raw = run(`openclaw skills search --json "${query}" 2>/dev/null || echo '[]'`);
+  return parseJson(raw) ?? [];
+}
+
+// ── Nodes ───────────────────────────────────────────────────────────────
+
+export function getNodes(): any[] {
+  const raw = run("openclaw nodes list --json 2>/dev/null || echo '[]'");
+  return parseJson(raw) ?? [];
+}
+
+export function notifyNode(nodeId: string, message: string): { ok: boolean; error?: string } {
+  try {
+    run(`openclaw nodes notify "${nodeId}" "${message}" 2>/dev/null`);
+    return { ok: true };
+  } catch (e: any) {
+    return { ok: false, error: e.message };
+  }
+}
+
+// ── Sessions ────────────────────────────────────────────────────────────
+
+export function sendToSession(sessionKey: string, message: string): { ok: boolean; response?: string; error?: string } {
+  try {
+    const escaped = message.replace(/'/g, "'\\''");
+    const raw = run(`openclaw agent --message '${escaped}' --no-stream 2>&1`);
+    return { ok: true, response: raw };
+  } catch (e: any) {
+    return { ok: false, error: e.message };
+  }
+}
+
+// ── Gateway ─────────────────────────────────────────────────────────────
+
+export function getGatewayStatus(): any {
+  const raw = run("openclaw gateway status --json 2>/dev/null || echo '{}'");
+  return parseJson(raw) ?? {};
+}
+
+export function restartGateway(): { ok: boolean } {
+  try {
+    run("openclaw gateway restart 2>/dev/null");
+    return { ok: true };
+  } catch {
+    return { ok: false };
+  }
+}
+
+export function checkGatewayUpdates(): { available: boolean; version?: string } {
+  try {
+    const raw = run("openclaw gateway check-update --json 2>/dev/null || echo '{}'");
+    const data = parseJson(raw);
+    return { available: !!data?.updateAvailable, version: data?.latestVersion };
+  } catch {
+    return { available: false };
+  }
+}
+
+// ── Cron ─────────────────────────────────────────────────────────────────
+
+export function runCronJob(jobId: string): { ok: boolean; output?: string; error?: string } {
+  try {
+    const raw = run(`openclaw cron run "${jobId}" 2>&1`);
+    return { ok: true, output: raw };
+  } catch (e: any) {
+    return { ok: false, error: e.message };
+  }
+}
