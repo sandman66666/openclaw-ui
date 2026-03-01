@@ -42,30 +42,27 @@ function AgentCard({ agent, onDelete }: { agent: Agent; onDelete: (id: string) =
   return (
     <motion.div
       layout
-      className={cn(
-        "rounded-2xl overflow-hidden",
-        "bg-white dark:bg-gray-800/50",
-        "border border-gray-200/50 dark:border-gray-700/50",
-        "shadow-sm"
-      )}
+      className="rounded-lg overflow-hidden border"
+      style={{ background: "var(--bg-card)", borderColor: "var(--border-default)" }}
     >
       <div className="p-4 space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div
-              className={cn(
-                "w-12 h-12 rounded-xl flex items-center justify-center",
-                "bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400"
-              )}
+              className="w-11 h-11 rounded-lg flex items-center justify-center"
+              style={{ background: "rgba(232, 69, 60, 0.1)" }}
             >
-              <Bot className="w-6 h-6" />
+              <Bot className="w-5 h-5" style={{ color: "var(--accent-primary)" }} />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 dark:text-white">
+              <h3 className="font-semibold text-sm" style={{ color: "var(--text-primary)" }}>
                 {agent.id === "main" ? "Main Agent" : (agent as any).name || agent.id}
               </h3>
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-50 dark:bg-green-500/10 text-green-600 dark:text-green-400 text-xs font-medium">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+              <span
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium"
+                style={{ background: "rgba(52, 211, 153, 0.1)", color: "var(--accent-green)" }}
+              >
+                <span className="w-1.5 h-1.5 rounded-full" style={{ background: "var(--accent-green)" }} />
                 Active
               </span>
             </div>
@@ -75,13 +72,15 @@ function AgentCard({ agent, onDelete }: { agent: Agent; onDelete: (id: string) =
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => onDelete(agent.id)}
-                  className="p-2 rounded-lg bg-red-50 dark:bg-red-500/10 text-red-600 hover:bg-red-100 dark:hover:bg-red-500/20 transition-colors"
+                  className="p-2 rounded-lg transition-colors"
+                  style={{ background: "rgba(239, 68, 68, 0.1)", color: "#EF4444" }}
                 >
                   <Check className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => setConfirming(false)}
-                  className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                  className="p-2 rounded-lg transition-colors"
+                  style={{ background: "var(--bg-elevated)", color: "var(--text-muted)" }}
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -89,7 +88,10 @@ function AgentCard({ agent, onDelete }: { agent: Agent; onDelete: (id: string) =
             ) : (
               <button
                 onClick={() => setConfirming(true)}
-                className="p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+                className="p-2 rounded-lg transition-colors"
+                style={{ color: "var(--text-muted)" }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = "#EF4444"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-muted)"; }}
               >
                 <Trash2 className="w-4 h-4" />
               </button>
@@ -99,24 +101,24 @@ function AgentCard({ agent, onDelete }: { agent: Agent; onDelete: (id: string) =
 
         <div className="space-y-2">
           <div className="flex items-center gap-3 text-sm">
-            <Cpu className="w-4 h-4 text-gray-400 shrink-0" />
-            <span className="text-gray-500 dark:text-gray-400">Model:</span>
-            <span className="text-gray-900 dark:text-white font-mono text-xs truncate">
+            <Cpu className="w-4 h-4 shrink-0" style={{ color: "var(--text-muted)" }} />
+            <span style={{ color: "var(--text-secondary)" }}>Model:</span>
+            <span className="font-mono text-xs truncate" style={{ color: "var(--text-primary)" }}>
               {agent.model}
             </span>
           </div>
           <div className="flex items-center gap-3 text-sm">
-            <FolderOpen className="w-4 h-4 text-gray-400 shrink-0" />
-            <span className="text-gray-500 dark:text-gray-400">Workspace:</span>
-            <span className="text-gray-900 dark:text-white font-mono text-xs truncate">
+            <FolderOpen className="w-4 h-4 shrink-0" style={{ color: "var(--text-muted)" }} />
+            <span style={{ color: "var(--text-secondary)" }}>Workspace:</span>
+            <span className="font-mono text-xs truncate" style={{ color: "var(--text-primary)" }}>
               {agent.workspace}
             </span>
           </div>
           {agent.heartbeat && Object.keys(agent.heartbeat).length > 0 && (
             <div className="flex items-center gap-3 text-sm">
-              <Heart className="w-4 h-4 text-gray-400 shrink-0" />
-              <span className="text-gray-500 dark:text-gray-400">Heartbeat:</span>
-              <span className="text-gray-900 dark:text-white text-xs">
+              <Heart className="w-4 h-4 shrink-0" style={{ color: "var(--text-muted)" }} />
+              <span style={{ color: "var(--text-secondary)" }}>Heartbeat:</span>
+              <span className="text-xs" style={{ color: "var(--text-primary)" }}>
                 {agent.heartbeat.intervalMinutes
                   ? `every ${agent.heartbeat.intervalMinutes}m`
                   : agent.heartbeat.every || "configured"}
@@ -165,7 +167,7 @@ function SkillPicker({
 
   if (loading) {
     return (
-      <div className="flex items-center gap-2 text-sm text-gray-400 py-4">
+      <div className="flex items-center gap-2 text-sm py-4" style={{ color: "var(--text-muted)" }}>
         <Loader2 className="w-4 h-4 animate-spin" />
         Loading skills...
       </div>
@@ -175,7 +177,7 @@ function SkillPicker({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label className="text-sm font-medium" style={{ color: "var(--text-secondary)" }}>
           Skills ({selected.length} selected)
         </label>
         <input
@@ -183,14 +185,13 @@ function SkillPicker({
           placeholder="Search skills..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className={cn(
-            "px-3 py-1.5 rounded-lg text-xs w-48",
-            "bg-gray-100 dark:bg-gray-700/50",
-            "border border-gray-200 dark:border-gray-600",
-            "text-gray-900 dark:text-white",
-            "placeholder-gray-400",
-            "focus:outline-none focus:ring-2 focus:ring-blue-500/30"
-          )}
+          className="px-3 py-1.5 rounded-lg text-xs w-48 border focus:outline-none focus:ring-2"
+          style={{
+            background: "var(--bg-input)",
+            borderColor: "var(--border-default)",
+            color: "var(--text-primary)",
+            "--tw-ring-color": "rgba(232, 69, 60, 0.15)",
+          } as React.CSSProperties}
         />
       </div>
 
@@ -201,27 +202,21 @@ function SkillPicker({
             <button
               key={skill.name}
               onClick={() => onToggle(skill.name)}
-              className={cn(
-                "flex items-start gap-2 p-2.5 rounded-xl text-left transition-all",
-                "border",
-                isSelected
-                  ? "bg-blue-50 dark:bg-blue-500/10 border-blue-300 dark:border-blue-500/30"
-                  : "bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700/50 hover:border-gray-300 dark:hover:border-gray-600"
-              )}
+              className="flex items-start gap-2 p-2.5 rounded-lg text-left transition-all border"
+              style={{
+                background: isSelected ? "rgba(232, 69, 60, 0.06)" : "var(--bg-elevated)",
+                borderColor: isSelected ? "rgba(232, 69, 60, 0.3)" : "var(--border-default)",
+              }}
             >
               <span className="text-base shrink-0">{skill.emoji || "🔧"}</span>
               <div className="min-w-0">
                 <p
-                  className={cn(
-                    "text-xs font-medium truncate",
-                    isSelected
-                      ? "text-blue-700 dark:text-blue-300"
-                      : "text-gray-900 dark:text-white"
-                  )}
+                  className="text-xs font-medium truncate"
+                  style={{ color: isSelected ? "var(--accent-primary)" : "var(--text-primary)" }}
                 >
                   {skill.name}
                 </p>
-                <p className="text-[10px] text-gray-500 dark:text-gray-400 line-clamp-2 mt-0.5">
+                <p className="text-[10px] line-clamp-2 mt-0.5" style={{ color: "var(--text-muted)" }}>
                   {skill.description}
                 </p>
               </div>
@@ -233,7 +228,8 @@ function SkillPicker({
       {filtered.length > 8 && (
         <button
           onClick={() => setExpanded(!expanded)}
-          className="flex items-center gap-1 text-xs text-blue-500 hover:text-blue-600 transition-colors"
+          className="flex items-center gap-1 text-xs transition-colors"
+          style={{ color: "var(--accent-primary)" }}
         >
           {expanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
           {expanded ? "Show less" : `Show all ${filtered.length} skills`}
@@ -332,28 +328,30 @@ function CreateAgentPanel({ onCreated, onCancel }: { onCreated: () => void; onCa
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 20 }}
-      className={cn(
-        "rounded-2xl overflow-hidden",
-        "bg-white dark:bg-gray-800/80",
-        "border border-blue-200/50 dark:border-blue-500/20",
-        "shadow-lg shadow-blue-500/5"
-      )}
+      className="rounded-lg overflow-hidden border"
+      style={{ background: "var(--bg-card)", borderColor: "rgba(232, 69, 60, 0.2)" }}
     >
       <div className="p-5 space-y-5">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white">
-              <Plus className="w-5 h-5" />
+            <div
+              className="w-10 h-10 rounded-lg flex items-center justify-center"
+              style={{ background: "var(--accent-primary)" }}
+            >
+              <Plus className="w-5 h-5" style={{ color: "var(--text-on-accent)" }} />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 dark:text-white">Create Agent</h3>
-              <p className="text-xs text-gray-500">Define your AI agent&apos;s identity</p>
+              <h3 className="font-semibold text-sm" style={{ color: "var(--text-primary)" }}>Create Agent</h3>
+              <p className="text-xs" style={{ color: "var(--text-muted)" }}>Define your AI agent&apos;s identity</p>
             </div>
           </div>
           <button
             onClick={onCancel}
-            className="p-2 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            className="p-2 rounded-lg transition-colors"
+            style={{ color: "var(--text-muted)" }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = "var(--bg-elevated)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
           >
             <X className="w-5 h-5" />
           </button>
@@ -362,7 +360,7 @@ function CreateAgentPanel({ onCreated, onCancel }: { onCreated: () => void; onCa
         {/* Name + ID */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">
+            <label className="text-sm font-medium mb-1 block" style={{ color: "var(--text-secondary)" }}>
               Agent Name
             </label>
             <input
@@ -370,51 +368,49 @@ function CreateAgentPanel({ onCreated, onCancel }: { onCreated: () => void; onCa
               placeholder="My Assistant"
               value={form.name}
               onChange={(e) => handleNameChange(e.target.value)}
-              className={cn(
-                "w-full px-3 py-2.5 rounded-xl text-sm",
-                "bg-gray-50 dark:bg-gray-700/50",
-                "border border-gray-200 dark:border-gray-600",
-                "text-gray-900 dark:text-white",
-                "placeholder-gray-400",
-                "focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
-              )}
+              className="w-full px-3 py-2.5 rounded-lg text-sm border focus:outline-none focus:ring-2"
+              style={{
+                background: "var(--bg-input)",
+                borderColor: "var(--border-default)",
+                color: "var(--text-primary)",
+                "--tw-ring-color": "rgba(232, 69, 60, 0.15)",
+              } as React.CSSProperties}
             />
           </div>
           <div>
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">
+            <label className="text-sm font-medium mb-1 block" style={{ color: "var(--text-secondary)" }}>
               Agent ID
             </label>
             <input
               type="text"
               value={form.id}
               onChange={(e) => setForm((f) => ({ ...f, id: e.target.value }))}
-              className={cn(
-                "w-full px-3 py-2.5 rounded-xl text-sm font-mono",
-                "bg-gray-50 dark:bg-gray-700/50",
-                "border border-gray-200 dark:border-gray-600",
-                "text-gray-900 dark:text-white",
-                "placeholder-gray-400",
-                "focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
-              )}
+              className="w-full px-3 py-2.5 rounded-lg text-sm font-mono border focus:outline-none focus:ring-2"
+              style={{
+                background: "var(--bg-input)",
+                borderColor: "var(--border-default)",
+                color: "var(--text-primary)",
+                "--tw-ring-color": "rgba(232, 69, 60, 0.15)",
+              } as React.CSSProperties}
             />
           </div>
         </div>
 
         {/* Model */}
         <div>
-          <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">
+          <label className="text-sm font-medium mb-1 block" style={{ color: "var(--text-secondary)" }}>
             Model
           </label>
           <select
             value={form.model}
             onChange={(e) => setForm((f) => ({ ...f, model: e.target.value }))}
-            className={cn(
-              "w-full px-3 py-2.5 rounded-xl text-sm",
-              "bg-gray-50 dark:bg-gray-700/50",
-              "border border-gray-200 dark:border-gray-600",
-              "text-gray-900 dark:text-white",
-              "focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
-            )}
+            className="w-full px-3 py-2.5 rounded-lg text-sm border focus:outline-none focus:ring-2"
+            style={{
+              background: "var(--bg-input)",
+              borderColor: "var(--border-default)",
+              color: "var(--text-primary)",
+              "--tw-ring-color": "rgba(232, 69, 60, 0.15)",
+            } as React.CSSProperties}
           >
             {MODELS.map((m) => (
               <option key={m.value} value={m.value}>{m.label}</option>
@@ -425,20 +421,17 @@ function CreateAgentPanel({ onCreated, onCancel }: { onCreated: () => void; onCa
         {/* System Prompt */}
         <div>
           <div className="flex items-center justify-between mb-1">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label className="text-sm font-medium" style={{ color: "var(--text-secondary)" }}>
               System Prompt
             </label>
             <button
               onClick={optimizePrompt}
               disabled={optimizing || !form.systemPrompt.trim()}
-              className={cn(
-                "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
-                optimizing
-                  ? "bg-purple-100 dark:bg-purple-500/20 text-purple-500 cursor-wait"
-                  : form.systemPrompt.trim()
-                    ? "bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:from-purple-600 hover:to-blue-600 shadow-sm"
-                    : "bg-gray-100 dark:bg-gray-700 text-gray-400 cursor-not-allowed"
-              )}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all disabled:opacity-40"
+              style={{
+                background: optimizing ? "rgba(232, 69, 60, 0.1)" : form.systemPrompt.trim() ? "var(--accent-primary)" : "var(--bg-elevated)",
+                color: form.systemPrompt.trim() && !optimizing ? "var(--text-on-accent)" : "var(--text-muted)",
+              }}
             >
               {optimizing ? (
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -453,17 +446,15 @@ function CreateAgentPanel({ onCreated, onCancel }: { onCreated: () => void; onCa
             value={form.systemPrompt}
             onChange={(e) => setForm((f) => ({ ...f, systemPrompt: e.target.value }))}
             rows={8}
-            className={cn(
-              "w-full px-4 py-3 rounded-xl text-sm leading-relaxed",
-              "bg-gray-50 dark:bg-gray-700/50",
-              "border border-gray-200 dark:border-gray-600",
-              "text-gray-900 dark:text-white",
-              "placeholder-gray-400",
-              "focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500",
-              "resize-y font-mono"
-            )}
+            className="w-full px-4 py-3 rounded-lg text-sm leading-relaxed border focus:outline-none focus:ring-2 resize-y font-mono"
+            style={{
+              background: "var(--bg-input)",
+              borderColor: "var(--border-default)",
+              color: "var(--text-primary)",
+              "--tw-ring-color": "rgba(232, 69, 60, 0.15)",
+            } as React.CSSProperties}
           />
-          <p className="text-xs text-gray-400 mt-1">
+          <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>
             {form.systemPrompt.length} characters
             {form.systemPrompt.length > 0 && ` · ~${Math.ceil(form.systemPrompt.length / 4)} tokens`}
           </p>
@@ -474,7 +465,10 @@ function CreateAgentPanel({ onCreated, onCancel }: { onCreated: () => void; onCa
 
         {/* Error */}
         {error && (
-          <div className="px-4 py-3 rounded-xl bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 text-sm">
+          <div
+            className="px-4 py-3 rounded-lg text-sm"
+            style={{ background: "rgba(239, 68, 68, 0.1)", color: "#EF4444" }}
+          >
             {error}
           </div>
         )}
@@ -484,12 +478,11 @@ function CreateAgentPanel({ onCreated, onCancel }: { onCreated: () => void; onCa
           <button
             onClick={createAgent}
             disabled={saving || !form.name.trim()}
-            className={cn(
-              "flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium text-sm transition-all",
-              saving || !form.name.trim()
-                ? "bg-gray-100 dark:bg-gray-700 text-gray-400 cursor-not-allowed"
-                : "bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 shadow-md shadow-blue-500/20"
-            )}
+            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium text-sm transition-all disabled:opacity-40"
+            style={{
+              background: saving || !form.name.trim() ? "var(--bg-elevated)" : "var(--accent-primary)",
+              color: saving || !form.name.trim() ? "var(--text-muted)" : "var(--text-on-accent)",
+            }}
           >
             {saving ? (
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -500,7 +493,10 @@ function CreateAgentPanel({ onCreated, onCancel }: { onCreated: () => void; onCa
           </button>
           <button
             onClick={onCancel}
-            className="px-4 py-3 rounded-xl text-sm font-medium text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            className="px-4 py-3 rounded-lg text-sm font-medium transition-colors"
+            style={{ color: "var(--text-secondary)" }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = "var(--bg-elevated)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
           >
             Cancel
           </button>
@@ -533,13 +529,13 @@ export function AgentsView() {
   };
 
   return (
-    <div className="px-4 py-6 space-y-6 max-w-3xl mx-auto">
+    <div className="max-w-[800px] mx-auto px-8 pt-6 pb-8 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+          <h2 className="text-2xl font-semibold" style={{ color: "var(--text-primary)" }}>
             Agents
           </h2>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">
+          <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
             {agents.length === 0
               ? loading["agents"]
                 ? "Loading..."
@@ -550,12 +546,11 @@ export function AgentsView() {
         {!showCreate && (
           <button
             onClick={() => setShowCreate(true)}
-            className={cn(
-              "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all",
-              "bg-gradient-to-r from-blue-500 to-purple-500 text-white",
-              "hover:from-blue-600 hover:to-purple-600",
-              "shadow-md shadow-blue-500/20"
-            )}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors"
+            style={{
+              background: "var(--accent-primary)",
+              color: "var(--text-on-accent)",
+            }}
           >
             <Plus className="w-4 h-4" />
             Create Agent

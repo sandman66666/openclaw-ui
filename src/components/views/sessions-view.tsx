@@ -8,7 +8,6 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { apiUrl } from "@/lib/config";
-import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
 
 interface Session {
@@ -102,41 +101,39 @@ function SessionCard({
   return (
     <motion.div
       layout
-      className={cn(
-        "rounded-2xl overflow-hidden",
-        "bg-white dark:bg-gray-800/50",
-        "border border-gray-200/50 dark:border-gray-700/50",
-        "shadow-sm"
-      )}
+      className="rounded-lg overflow-hidden border"
+      style={{ background: "var(--bg-card)", borderColor: "var(--border-default)" }}
     >
       <button
         onClick={onToggle}
-        className="w-full p-4 flex items-center gap-3 text-left hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+        className="w-full p-4 flex items-center gap-3 text-left transition-colors"
+        onMouseEnter={(e) => { e.currentTarget.style.background = "var(--bg-card-hover)"; }}
+        onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
       >
-        <div className={cn(
-          "w-10 h-10 rounded-xl flex items-center justify-center",
-          "bg-orange-50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-400"
-        )}>
-          <MessageSquare className="w-5 h-5" />
+        <div
+          className="w-10 h-10 rounded-lg flex items-center justify-center"
+          style={{ background: "rgba(232, 69, 60, 0.1)" }}
+        >
+          <MessageSquare className="w-5 h-5" style={{ color: "var(--accent-primary)" }} />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="font-medium text-gray-900 dark:text-white truncate text-sm">
+          <h3 className="font-medium truncate text-sm" style={{ color: "var(--text-primary)" }}>
             {sessionKey || "Unknown Session"}
           </h3>
-          <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+          <p className="text-xs truncate" style={{ color: "var(--text-secondary)" }}>
             {session.kind && <span className="mr-2">{session.kind}</span>}
             {session.lastMessage?.slice(0, 80) || "No messages"}
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <span className="text-xs text-gray-400 flex items-center gap-1">
+          <span className="text-xs flex items-center gap-1" style={{ color: "var(--text-muted)" }}>
             <Clock className="w-3 h-3" />
             {formatAge(session)}
           </span>
           {isExpanded ? (
-            <ChevronDown className="w-4 h-4 text-gray-400" />
+            <ChevronDown className="w-4 h-4" style={{ color: "var(--text-muted)" }} />
           ) : (
-            <ChevronRight className="w-4 h-4 text-gray-400" />
+            <ChevronRight className="w-4 h-4" style={{ color: "var(--text-muted)" }} />
           )}
         </div>
       </button>
@@ -150,15 +147,15 @@ function SessionCard({
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
-            <div className="px-4 pb-4 border-t border-gray-100 dark:border-gray-700/50">
+            <div className="px-4 pb-4 border-t" style={{ borderColor: "var(--border-subtle)" }}>
               {/* History */}
               <div className="mt-3 max-h-64 overflow-y-auto space-y-2">
                 {loadingHistory ? (
                   <div className="flex items-center justify-center py-6">
-                    <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
+                    <Loader2 className="w-5 h-5 animate-spin" style={{ color: "var(--text-muted)" }} />
                   </div>
                 ) : history.length === 0 ? (
-                  <p className="text-sm text-gray-400 py-4 text-center">No messages in this session</p>
+                  <p className="text-sm py-4 text-center" style={{ color: "var(--text-muted)" }}>No messages in this session</p>
                 ) : (
                   history.map((msg, i) => (
                     <div
@@ -169,20 +166,19 @@ function SessionCard({
                       )}
                     >
                       {msg.role !== "user" && (
-                        <Bot className="w-4 h-4 mt-1 text-orange-400 shrink-0" />
+                        <Bot className="w-4 h-4 mt-1 shrink-0" style={{ color: "var(--accent-primary)" }} />
                       )}
                       <div
-                        className={cn(
-                          "rounded-xl px-3 py-2 max-w-[80%]",
-                          msg.role === "user"
-                            ? "bg-orange-500 text-white"
-                            : "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white"
-                        )}
+                        className="rounded-lg px-3 py-2 max-w-[80%]"
+                        style={{
+                          background: msg.role === "user" ? "var(--accent-primary)" : "var(--bg-elevated)",
+                          color: msg.role === "user" ? "var(--text-on-accent)" : "var(--text-primary)",
+                        }}
                       >
                         {msg.content || msg.text || JSON.stringify(msg)}
                       </div>
                       {msg.role === "user" && (
-                        <User className="w-4 h-4 mt-1 text-gray-400 shrink-0" />
+                        <User className="w-4 h-4 mt-1 shrink-0" style={{ color: "var(--text-muted)" }} />
                       )}
                     </div>
                   ))
@@ -196,22 +192,25 @@ function SessionCard({
                   onChange={(e) => setMessage(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}
                   placeholder="Send a message..."
-                  className={cn(
-                    "flex-1 px-3 py-2.5 rounded-xl text-sm",
-                    "bg-gray-50 dark:bg-gray-800",
-                    "border border-gray-200 dark:border-gray-700",
-                    "text-gray-900 dark:text-white placeholder-gray-400",
-                    "focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
-                  )}
+                  className="flex-1 px-3 py-2.5 rounded-lg text-sm border focus:outline-none focus:ring-2"
+                  style={{
+                    background: "var(--bg-input)",
+                    borderColor: "var(--border-default)",
+                    color: "var(--text-primary)",
+                    "--tw-ring-color": "rgba(232, 69, 60, 0.15)",
+                  } as React.CSSProperties}
                 />
-                <Button
-                  size="sm"
+                <button
                   onClick={handleSend}
                   disabled={!message.trim() || sending}
-                  className="gap-1.5 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
+                  className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-sm font-semibold disabled:opacity-40 transition-colors"
+                  style={{
+                    background: "var(--accent-primary)",
+                    color: "var(--text-on-accent)",
+                  }}
                 >
                   {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                </Button>
+                </button>
               </div>
             </div>
           </motion.div>
@@ -244,36 +243,35 @@ export function SessionsView() {
   }, [loadSessions]);
 
   return (
-    <div className="px-4 py-6 space-y-6">
+    <div className="max-w-[800px] mx-auto px-8 pt-6 pb-8 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+          <h2 className="text-2xl font-semibold" style={{ color: "var(--text-primary)" }}>
             Sessions
           </h2>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">
+          <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
             {loading ? "Loading..." : `${sessions.length} active session${sessions.length !== 1 ? "s" : ""}`}
           </p>
         </div>
-        <Button
-          variant="secondary"
-          size="sm"
+        <button
           onClick={loadSessions}
           disabled={loading}
-          className="gap-1.5"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors"
+          style={{ borderColor: "var(--border-default)", color: "var(--text-secondary)" }}
         >
           <RefreshCw className={cn("w-4 h-4", loading && "animate-spin")} />
           Refresh
-        </Button>
+        </button>
       </div>
 
       {loading && sessions.length === 0 ? (
         <div className="flex items-center justify-center py-16">
-          <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+          <Loader2 className="w-8 h-8 animate-spin" style={{ color: "var(--text-muted)" }} />
         </div>
       ) : sessions.length === 0 ? (
         <div className="text-center py-16">
-          <MessageSquare className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
-          <p className="text-gray-500 dark:text-gray-400">No active sessions</p>
+          <MessageSquare className="w-12 h-12 mx-auto mb-3" style={{ color: "var(--text-muted)" }} />
+          <p style={{ color: "var(--text-secondary)" }}>No active sessions</p>
         </div>
       ) : (
         <div className="space-y-3">

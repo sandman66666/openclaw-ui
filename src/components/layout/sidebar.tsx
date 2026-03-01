@@ -29,32 +29,36 @@ export function Sidebar() {
 
   return (
     <aside
-      className={cn(
-        "hidden md:flex flex-col",
-        "w-64 lg:w-72 h-screen",
-        "bg-gray-50/80 backdrop-blur-xl",
-        "border-r border-gray-200/50",
-        "dark:bg-gray-900/80 dark:border-gray-700/50"
-      )}
+      className="hidden md:flex flex-col w-56 lg:w-60 h-screen border-r"
+      style={{
+        background: "var(--bg-base)",
+        borderColor: "var(--border-subtle)",
+      }}
     >
       {/* Logo */}
-      <div className="flex items-center gap-3 px-6 py-5 border-b border-gray-200/50 dark:border-gray-700/50">
-        <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center text-2xl shadow-lg">
+      <div
+        className="flex items-center gap-3 px-5 py-4 border-b"
+        style={{ borderColor: "var(--border-subtle)" }}
+      >
+        <div
+          className="w-9 h-9 rounded-lg flex items-center justify-center text-xl"
+          style={{ background: "var(--accent-primary)" }}
+        >
           🦞
         </div>
         <div>
-          <h1 className="font-semibold text-gray-900 dark:text-white">
+          <h1 className="font-semibold text-sm" style={{ color: "var(--text-primary)" }}>
             OpenClaw
           </h1>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs" style={{ color: "var(--text-muted)" }}>
             {connected ? (
               <span className="flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                <span className="w-1.5 h-1.5 rounded-full" style={{ background: "var(--accent-green)" }} />
                 Connected
               </span>
             ) : (
               <span className="flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-gray-400" />
+                <span className="w-1.5 h-1.5 rounded-full" style={{ background: "var(--text-muted)" }} />
                 Offline
               </span>
             )}
@@ -63,7 +67,7 @@ export function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-4 space-y-1">
+      <nav className="flex-1 px-2 py-3 space-y-0.5 overflow-y-auto">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
           const Icon = tab.icon;
@@ -73,22 +77,29 @@ export function Sidebar() {
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={cn(
-                "relative w-full flex items-center gap-3 px-4 py-3 rounded-xl",
-                "transition-colors duration-200",
-                isActive
-                  ? "text-blue-600 dark:text-blue-400"
-                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-800"
+                "relative w-full flex items-center gap-3 px-3 py-2.5 rounded-lg",
+                "transition-colors duration-150 text-sm"
               )}
+              style={{
+                color: isActive ? "var(--accent-primary)" : "var(--text-secondary)",
+              }}
+              onMouseEnter={(e) => {
+                if (!isActive) e.currentTarget.style.background = "var(--bg-card-hover)";
+              }}
+              onMouseLeave={(e) => {
+                if (!isActive) e.currentTarget.style.background = "transparent";
+              }}
             >
               {isActive && (
                 <motion.div
                   layoutId="sidebarIndicator"
-                  className="absolute inset-0 bg-blue-50 dark:bg-blue-500/10 rounded-xl"
+                  className="absolute inset-0 rounded-lg"
+                  style={{ background: "rgba(232, 69, 60, 0.08)" }}
                   transition={{ type: "spring", stiffness: 500, damping: 30 }}
                 />
               )}
               <Icon
-                className="relative w-5 h-5"
+                className="relative w-[18px] h-[18px]"
                 strokeWidth={isActive ? 2.5 : 2}
               />
               <span className="relative font-medium">{tab.label}</span>
@@ -98,8 +109,8 @@ export function Sidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="px-6 py-4 border-t border-gray-200/50 dark:border-gray-700/50">
-        <p className="text-xs text-gray-400">OpenClaw v1.0.0</p>
+      <div className="px-5 py-3 border-t" style={{ borderColor: "var(--border-subtle)" }}>
+        <p className="text-xs" style={{ color: "var(--text-muted)" }}>OpenClaw v1.0.0</p>
       </div>
     </aside>
   );

@@ -7,7 +7,6 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { apiUrl } from "@/lib/config";
-import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
 
 interface DailyFile {
@@ -27,7 +26,6 @@ export function MemoryView() {
   const [fileDraft, setFileDraft] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [mainPath, setMainPath] = useState("");
 
   const loadMemory = useCallback(async () => {
     setLoading(true);
@@ -37,18 +35,13 @@ export function MemoryView() {
       setMainContent(data.main || "");
       setMainDraft(data.main || "");
       setDailyFiles(data.dailyFiles || []);
-      // Store the main path for saving
-      const home = "~/.openclaw/workspace/MEMORY.md";
-      setMainPath(home);
     } catch {
       toast("error", "Failed to load memory");
     }
     setLoading(false);
   }, [toast]);
 
-  useEffect(() => {
-    loadMemory();
-  }, [loadMemory]);
+  useEffect(() => { loadMemory(); }, [loadMemory]);
 
   const loadFile = async (file: DailyFile) => {
     setSelectedFile(file);
@@ -74,16 +67,9 @@ export function MemoryView() {
       const data = await res.json();
       if (data.ok) {
         toast("success", "Saved successfully");
-        if (isMain) {
-          setMainContent(content);
-          setMainEditing(false);
-        } else {
-          setFileContent(content);
-          setFileEditing(false);
-        }
-      } else {
-        toast("error", data.error || "Failed to save");
-      }
+        if (isMain) { setMainContent(content); setMainEditing(false); }
+        else { setFileContent(content); setFileEditing(false); }
+      } else toast("error", data.error || "Failed to save");
     } catch {
       toast("error", "Failed to save");
     }
@@ -93,79 +79,68 @@ export function MemoryView() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-16">
-        <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+        <Loader2 className="w-8 h-8 animate-spin" style={{ color: "var(--text-muted)" }} />
       </div>
     );
   }
 
   return (
-    <div className="px-4 py-6 space-y-6">
+    <div className="max-w-[800px] mx-auto px-8 pt-6 pb-8 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
-            Memory
-          </h2>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">
-            Agent memory and daily logs
-          </p>
+          <h2 className="text-2xl font-semibold" style={{ color: "var(--text-primary)" }}>Memory</h2>
+          <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>Agent memory and daily logs</p>
         </div>
-        <Button variant="secondary" size="sm" onClick={loadMemory} className="gap-1.5">
+        <button
+          onClick={loadMemory}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors"
+          style={{ borderColor: "var(--border-default)", color: "var(--text-secondary)" }}
+        >
           <RefreshCw className="w-4 h-4" />
           Refresh
-        </Button>
+        </button>
       </div>
 
       {/* Main MEMORY.md */}
-      <motion.div
-        layout
-        className={cn(
-          "rounded-2xl overflow-hidden",
-          "bg-white dark:bg-gray-800/50",
-          "border border-gray-200/50 dark:border-gray-700/50",
-          "shadow-sm"
-        )}
-      >
+      <div className="rounded-lg overflow-hidden border" style={{ background: "var(--bg-card)", borderColor: "var(--border-default)" }}>
         <div className="p-4">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center">
-                <Brain className="w-5 h-5" />
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ background: "rgba(232, 69, 60, 0.1)" }}>
+                <Brain className="w-5 h-5" style={{ color: "var(--accent-primary)" }} />
               </div>
               <div>
-                <h3 className="font-medium text-gray-900 dark:text-white">MEMORY.md</h3>
-                <p className="text-xs text-gray-500">Main agent memory file</p>
+                <h3 className="font-medium text-sm" style={{ color: "var(--text-primary)" }}>MEMORY.md</h3>
+                <p className="text-xs" style={{ color: "var(--text-muted)" }}>Main agent memory file</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
               {mainEditing ? (
                 <>
-                  <Button
-                    variant="ghost"
-                    size="sm"
+                  <button
                     onClick={() => { setMainEditing(false); setMainDraft(mainContent); }}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    size="sm"
+                    className="px-3 py-1.5 rounded-lg text-sm"
+                    style={{ color: "var(--text-secondary)" }}
+                  >Cancel</button>
+                  <button
                     disabled={saving}
-                    onClick={() => saveFile(mainPath, mainDraft, true)}
-                    className="gap-1.5 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
+                    onClick={() => saveFile("", mainDraft, true)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold"
+                    style={{ background: "var(--accent-primary)", color: "var(--text-on-accent)" }}
                   >
                     {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                     Save
-                  </Button>
+                  </button>
                 </>
               ) : (
-                <Button
-                  variant="secondary"
-                  size="sm"
+                <button
                   onClick={() => setMainEditing(true)}
-                  className="gap-1.5"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm border transition-colors"
+                  style={{ borderColor: "var(--border-default)", color: "var(--text-secondary)" }}
                 >
                   <Edit3 className="w-4 h-4" />
                   Edit
-                </Button>
+                </button>
               )}
             </div>
           </div>
@@ -174,59 +149,55 @@ export function MemoryView() {
             <textarea
               value={mainDraft}
               onChange={(e) => setMainDraft(e.target.value)}
-              className={cn(
-                "w-full h-64 px-3 py-2.5 rounded-xl text-sm font-mono",
-                "bg-gray-50 dark:bg-gray-900",
-                "border border-gray-200 dark:border-gray-700",
-                "text-gray-900 dark:text-white placeholder-gray-400",
-                "focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500",
-                "resize-y"
-              )}
+              className="w-full h-64 px-3 py-2.5 rounded-lg text-sm font-mono resize-y border focus:outline-none focus:ring-2"
+              style={{
+                background: "var(--bg-input)",
+                borderColor: "var(--border-default)",
+                color: "var(--text-primary)",
+                "--tw-ring-color": "rgba(232, 69, 60, 0.15)",
+              } as React.CSSProperties}
             />
           ) : (
-            <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4 max-h-64 overflow-y-auto">
-              <pre className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap font-mono">
-                {mainContent || "Empty — no memory content yet"}
+            <div className="rounded-lg p-4 max-h-64 overflow-y-auto" style={{ background: "var(--bg-input)" }}>
+              <pre className="text-sm whitespace-pre-wrap font-mono" style={{ color: "var(--text-secondary)" }}>
+                {mainContent || "Empty - no memory content yet"}
               </pre>
             </div>
           )}
         </div>
-      </motion.div>
+      </div>
 
       {/* Daily Files */}
       <div>
-        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">
-          Daily Memory Files
-        </h3>
+        <h3 className="text-sm font-semibold mb-3" style={{ color: "var(--text-primary)" }}>Daily Memory Files</h3>
         {dailyFiles.length === 0 ? (
-          <div className="text-center py-10">
-            <FileText className="w-10 h-10 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
-            <p className="text-sm text-gray-500 dark:text-gray-400">No daily memory files found</p>
+          <div className="text-center py-12">
+            <FileText className="w-12 h-12 mx-auto mb-2" style={{ color: "var(--text-muted)" }} />
+            <p className="text-sm" style={{ color: "var(--text-secondary)" }}>No daily memory files found</p>
           </div>
         ) : (
-          <div className="grid gap-2">
+          <div className="rounded-lg overflow-hidden border" style={{ borderColor: "var(--border-default)" }}>
             {dailyFiles.map((file) => (
               <button
                 key={file.path}
                 onClick={() => loadFile(file)}
-                className={cn(
-                  "w-full flex items-center gap-3 p-3 rounded-xl text-left transition-colors",
-                  selectedFile?.path === file.path
-                    ? "bg-orange-50 dark:bg-orange-500/10 border border-orange-200 dark:border-orange-500/30"
-                    : "bg-white dark:bg-gray-800/50 border border-gray-200/50 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-800"
-                )}
+                className="w-full flex items-center gap-3 p-3 text-left transition-colors"
+                style={{
+                  background: selectedFile?.path === file.path ? "rgba(232, 69, 60, 0.06)" : "var(--bg-card)",
+                  borderBottom: "1px solid var(--border-subtle)",
+                }}
+                onMouseEnter={(e) => {
+                  if (selectedFile?.path !== file.path) e.currentTarget.style.background = "var(--bg-card-hover)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = selectedFile?.path === file.path ? "rgba(232, 69, 60, 0.06)" : "var(--bg-card)";
+                }}
               >
-                <FileText className={cn(
-                  "w-4 h-4",
-                  selectedFile?.path === file.path ? "text-orange-500" : "text-gray-400"
-                )} />
-                <span className={cn(
-                  "text-sm font-medium flex-1",
-                  selectedFile?.path === file.path ? "text-orange-600 dark:text-orange-400" : "text-gray-700 dark:text-gray-300"
-                )}>
+                <FileText className="w-4 h-4" style={{ color: selectedFile?.path === file.path ? "var(--accent-primary)" : "var(--text-muted)" }} />
+                <span className="text-sm font-medium flex-1" style={{ color: selectedFile?.path === file.path ? "var(--accent-primary)" : "var(--text-primary)" }}>
                   {file.name}
                 </span>
-                <ChevronRight className="w-4 h-4 text-gray-400" />
+                <ChevronRight className="w-4 h-4" style={{ color: "var(--text-muted)" }} />
               </button>
             ))}
           </div>
@@ -236,52 +207,40 @@ export function MemoryView() {
       {/* Selected File Content */}
       {selectedFile && (
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 0, y: 4 }}
           animate={{ opacity: 1, y: 0 }}
-          className={cn(
-            "rounded-2xl overflow-hidden",
-            "bg-white dark:bg-gray-800/50",
-            "border border-gray-200/50 dark:border-gray-700/50",
-            "shadow-sm"
-          )}
+          className="rounded-lg overflow-hidden border"
+          style={{ background: "var(--bg-card)", borderColor: "var(--border-default)" }}
         >
           <div className="p-4">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <FileText className="w-4 h-4 text-orange-500" />
-                <h4 className="font-medium text-gray-900 dark:text-white text-sm">{selectedFile.name}</h4>
+                <FileText className="w-4 h-4" style={{ color: "var(--accent-primary)" }} />
+                <h4 className="font-medium text-sm" style={{ color: "var(--text-primary)" }}>{selectedFile.name}</h4>
               </div>
               <div className="flex items-center gap-2">
                 {fileEditing ? (
                   <>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => { setFileEditing(false); setFileDraft(fileContent); }}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      size="sm"
+                    <button onClick={() => { setFileEditing(false); setFileDraft(fileContent); }} className="px-3 py-1.5 rounded-lg text-sm" style={{ color: "var(--text-secondary)" }}>Cancel</button>
+                    <button
                       disabled={saving}
                       onClick={() => saveFile(selectedFile.path, fileDraft, false)}
-                      className="gap-1.5 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold"
+                      style={{ background: "var(--accent-primary)", color: "var(--text-on-accent)" }}
                     >
                       {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                       Save
-                    </Button>
+                    </button>
                   </>
                 ) : (
-                  <>
-                    <Button variant="ghost" size="sm" className="gap-1.5">
-                      <Eye className="w-4 h-4" />
-                      View
-                    </Button>
-                    <Button variant="secondary" size="sm" onClick={() => setFileEditing(true)} className="gap-1.5">
-                      <Edit3 className="w-4 h-4" />
-                      Edit
-                    </Button>
-                  </>
+                  <button
+                    onClick={() => setFileEditing(true)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm border transition-colors"
+                    style={{ borderColor: "var(--border-default)", color: "var(--text-secondary)" }}
+                  >
+                    <Edit3 className="w-4 h-4" />
+                    Edit
+                  </button>
                 )}
               </div>
             </div>
@@ -290,18 +249,17 @@ export function MemoryView() {
               <textarea
                 value={fileDraft}
                 onChange={(e) => setFileDraft(e.target.value)}
-                className={cn(
-                  "w-full h-48 px-3 py-2.5 rounded-xl text-sm font-mono",
-                  "bg-gray-50 dark:bg-gray-900",
-                  "border border-gray-200 dark:border-gray-700",
-                  "text-gray-900 dark:text-white placeholder-gray-400",
-                  "focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500",
-                  "resize-y"
-                )}
+                className="w-full h-48 px-3 py-2.5 rounded-lg text-sm font-mono resize-y border focus:outline-none focus:ring-2"
+                style={{
+                  background: "var(--bg-input)",
+                  borderColor: "var(--border-default)",
+                  color: "var(--text-primary)",
+                  "--tw-ring-color": "rgba(232, 69, 60, 0.15)",
+                } as React.CSSProperties}
               />
             ) : (
-              <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4 max-h-64 overflow-y-auto">
-                <pre className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap font-mono">
+              <div className="rounded-lg p-4 max-h-64 overflow-y-auto" style={{ background: "var(--bg-input)" }}>
+                <pre className="text-sm whitespace-pre-wrap font-mono" style={{ color: "var(--text-secondary)" }}>
                   {fileContent || "Empty file"}
                 </pre>
               </div>

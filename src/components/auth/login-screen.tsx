@@ -73,8 +73,11 @@ export function LoginScreen({ onSuccess }: LoginScreenProps) {
   // Still checking server status
   if (isSetup === null) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-950">
-        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center text-3xl shadow-xl animate-pulse">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "var(--bg-base)" }}>
+        <div
+          className="w-16 h-16 rounded-lg flex items-center justify-center text-3xl shadow-xl animate-pulse"
+          style={{ background: "var(--accent-primary)" }}
+        >
           🦞
         </div>
       </div>
@@ -83,11 +86,8 @@ export function LoginScreen({ onSuccess }: LoginScreenProps) {
 
   return (
     <div
-      className={cn(
-        "min-h-screen flex items-center justify-center",
-        "bg-gray-950",
-        "px-4"
-      )}
+      className="min-h-screen flex items-center justify-center px-4"
+      style={{ background: "var(--bg-base)" }}
     >
       <motion.div
         initial={{ opacity: 0, y: 16 }}
@@ -97,13 +97,16 @@ export function LoginScreen({ onSuccess }: LoginScreenProps) {
       >
         {/* Logo */}
         <div className="flex flex-col items-center mb-10">
-          <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center text-4xl shadow-2xl mb-5">
+          <div
+            className="w-20 h-20 rounded-lg flex items-center justify-center text-4xl shadow-2xl mb-5"
+            style={{ background: "var(--accent-primary)" }}
+          >
             🦞
           </div>
-          <h1 className="text-2xl font-semibold text-white tracking-tight">
+          <h1 className="text-2xl font-semibold tracking-tight" style={{ color: "var(--text-primary)" }}>
             OpenClaw
           </h1>
-          <p className="mt-1 text-sm text-gray-400">
+          <p className="mt-1 text-sm" style={{ color: "var(--text-secondary)" }}>
             {isSetup
               ? "Create a password to secure your dashboard"
               : "Enter your password to continue"}
@@ -115,7 +118,7 @@ export function LoginScreen({ onSuccess }: LoginScreenProps) {
           {/* Password field */}
           <div className="relative">
             <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-              <Lock className="w-4 h-4 text-gray-500" />
+              <Lock className="w-4 h-4" style={{ color: "var(--text-muted)" }} />
             </div>
             <input
               ref={inputRef}
@@ -128,15 +131,13 @@ export function LoginScreen({ onSuccess }: LoginScreenProps) {
               placeholder={isSetup ? "Choose a password" : "Password"}
               autoFocus
               autoComplete={isSetup ? "new-password" : "current-password"}
-              className={cn(
-                "w-full pl-11 pr-4 py-3.5 rounded-xl",
-                "bg-gray-800 text-white placeholder-gray-500",
-                "border transition-colors duration-200",
-                error
-                  ? "border-red-500/70 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
-                  : "border-gray-700 focus:border-orange-400/70 focus:ring-2 focus:ring-orange-400/20",
-                "focus:outline-none"
-              )}
+              className="w-full pl-11 pr-4 py-3.5 rounded-lg border transition-colors duration-200 focus:outline-none focus:ring-2"
+              style={{
+                background: "var(--bg-card)",
+                color: "var(--text-primary)",
+                borderColor: error ? "rgba(239, 68, 68, 0.5)" : "var(--border-default)",
+                "--tw-ring-color": error ? "rgba(239, 68, 68, 0.2)" : "rgba(232, 69, 60, 0.2)",
+              } as React.CSSProperties}
             />
           </div>
 
@@ -144,7 +145,7 @@ export function LoginScreen({ onSuccess }: LoginScreenProps) {
           {isSetup && (
             <div className="relative">
               <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-                <ShieldCheck className="w-4 h-4 text-gray-500" />
+                <ShieldCheck className="w-4 h-4" style={{ color: "var(--text-muted)" }} />
               </div>
               <input
                 type="password"
@@ -155,15 +156,13 @@ export function LoginScreen({ onSuccess }: LoginScreenProps) {
                 }}
                 placeholder="Confirm password"
                 autoComplete="new-password"
-                className={cn(
-                  "w-full pl-11 pr-4 py-3.5 rounded-xl",
-                  "bg-gray-800 text-white placeholder-gray-500",
-                  "border transition-colors duration-200",
-                  error
-                    ? "border-red-500/70 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
-                    : "border-gray-700 focus:border-orange-400/70 focus:ring-2 focus:ring-orange-400/20",
-                  "focus:outline-none"
-                )}
+                className="w-full pl-11 pr-4 py-3.5 rounded-lg border transition-colors duration-200 focus:outline-none focus:ring-2"
+                style={{
+                  background: "var(--bg-card)",
+                  color: "var(--text-primary)",
+                  borderColor: error ? "rgba(239, 68, 68, 0.5)" : "var(--border-default)",
+                  "--tw-ring-color": error ? "rgba(239, 68, 68, 0.2)" : "rgba(232, 69, 60, 0.2)",
+                } as React.CSSProperties}
               />
             </div>
           )}
@@ -173,7 +172,8 @@ export function LoginScreen({ onSuccess }: LoginScreenProps) {
             <motion.p
               initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-sm text-red-400 text-center"
+              className="text-sm text-center"
+              style={{ color: "#EF4444" }}
             >
               {error}
             </motion.p>
@@ -186,14 +186,11 @@ export function LoginScreen({ onSuccess }: LoginScreenProps) {
               loading ||
               (isSetup && !confirm.trim())
             }
-            className={cn(
-              "w-full py-3.5 rounded-xl font-semibold text-white",
-              "bg-gradient-to-r from-orange-400 to-red-500",
-              "shadow-lg shadow-red-500/20",
-              "hover:from-orange-500 hover:to-red-600",
-              "active:scale-[0.98] transition-all duration-200",
-              "disabled:opacity-40 disabled:cursor-not-allowed disabled:scale-100"
-            )}
+            className="w-full py-3.5 rounded-lg font-semibold active:scale-[0.98] transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:scale-100"
+            style={{
+              background: "var(--accent-primary)",
+              color: "var(--text-on-accent)",
+            }}
           >
             {loading
               ? isSetup

@@ -1,14 +1,32 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f9fafb;
-  --foreground: #111827;
-  --font-inter: "Inter", system-ui, sans-serif;
-}
+  /* Navigator Dark Design System */
+  --bg-base: #0D0D0D;
+  --bg-surface: #161616;
+  --bg-card: #1E1E1E;
+  --bg-card-hover: #252525;
+  --bg-elevated: #2A2A2A;
+  --bg-input: #1A1A1A;
 
-.dark {
-  --background: #030712;
-  --foreground: #f9fafb;
+  --text-primary: #E8E8E8;
+  --text-secondary: #999999;
+  --text-muted: #666666;
+  --text-on-accent: #FFFFFF;
+
+  --accent-primary: #E8453C;
+  --accent-primary-hover: #D03A32;
+  --accent-green: #4ADE80;
+  --accent-orange: #F59E0B;
+  --accent-blue: #3B82F6;
+
+  --border-subtle: #1F1F1F;
+  --border-default: #2A2A2A;
+  --border-focus: #E8453C;
+
+  --background: var(--bg-base);
+  --foreground: var(--text-primary);
+  --font-inter: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 @theme inline {
@@ -24,53 +42,54 @@
 html {
   height: 100%;
   -webkit-tap-highlight-color: transparent;
+  scroll-behavior: smooth;
+  /* Force dark */
+  color-scheme: dark;
 }
 
 body {
   min-height: 100%;
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--bg-base);
+  color: var(--text-primary);
   font-family: var(--font-inter);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar — thin, dark */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #333333;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #444444;
 }
 
 /* Safe area padding for iOS */
 .pb-safe {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
-
 .pt-safe {
   padding-top: env(safe-area-inset-top, 0px);
 }
 
-/* Hide scrollbar but keep functionality */
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
-
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Apple-like selection color */
+/* Selection color */
 ::selection {
-  background-color: rgba(59, 130, 246, 0.3);
+  background-color: rgba(232, 69, 60, 0.3);
 }
 
 /* Focus visible only for keyboard navigation */
 :focus:not(:focus-visible) {
   outline: none;
 }
-
 :focus-visible {
-  outline: 2px solid rgba(59, 130, 246, 0.5);
+  outline: 2px solid var(--accent-primary);
   outline-offset: 2px;
 }
 
@@ -80,10 +99,10 @@ button,
   user-select: none;
 }
 
-/* Smooth transitions for theme changes */
+/* Smooth transitions for hover */
 * {
-  transition-property: background-color, border-color;
-  transition-timing-function: ease-out;
+  transition-property: background-color, border-color, color, opacity;
+  transition-timing-function: ease;
   transition-duration: 150ms;
 }
 
@@ -91,4 +110,10 @@ button,
 [class*="animate-"],
 [class*="transition-"] {
   transition-property: all;
+}
+
+/* Force select/option dark bg */
+select option {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
 }

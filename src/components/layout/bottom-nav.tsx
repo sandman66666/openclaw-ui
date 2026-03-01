@@ -1,11 +1,11 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { MessageCircle, Sparkles, Bot, CheckSquare, Settings, MoreHorizontal } from "lucide-react";
+import { MessageCircle, Sparkles, Bot, CheckSquare, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAppStore, type TabId } from "@/stores/app-store";
 
-// Mobile bottom nav shows 5 most important tabs (full list accessible from sidebar on desktop)
+// Mobile bottom nav shows 5 most important tabs
 const tabs: { id: TabId; icon: typeof MessageCircle; label: string }[] = [
   { id: "chat", icon: MessageCircle, label: "Chat" },
   { id: "tasks", icon: CheckSquare, label: "Tasks" },
@@ -19,12 +19,13 @@ export function BottomNav() {
 
   return (
     <nav
-      className={cn(
-        "fixed bottom-0 left-0 right-0 z-50",
-        "bg-white/80 backdrop-blur-xl border-t border-gray-200/50",
-        "dark:bg-gray-900/80 dark:border-gray-700/50",
-        "pb-safe md:hidden"
-      )}
+      className="fixed bottom-0 left-0 right-0 z-50 border-t pb-safe md:hidden"
+      style={{
+        background: "rgba(13, 13, 13, 0.85)",
+        backdropFilter: "blur(20px)",
+        WebkitBackdropFilter: "blur(20px)",
+        borderColor: "var(--border-subtle)",
+      }}
     >
       <div className="flex items-center justify-around h-16 px-2">
         {tabs.map((tab) => {
@@ -35,19 +36,14 @@ export function BottomNav() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={cn(
-                "relative flex flex-col items-center justify-center",
-                "w-16 h-full",
-                "transition-colors duration-200",
-                isActive
-                  ? "text-blue-500"
-                  : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-              )}
+              className="relative flex flex-col items-center justify-center w-16 h-full transition-colors duration-200"
+              style={{ color: isActive ? "var(--accent-primary)" : "var(--text-muted)" }}
             >
               {isActive && (
                 <motion.div
                   layoutId="bottomNavIndicator"
-                  className="absolute inset-x-2 top-0 h-0.5 bg-blue-500 rounded-full"
+                  className="absolute inset-x-2 top-0 h-0.5 rounded-full"
+                  style={{ background: "var(--accent-primary)" }}
                   transition={{ type: "spring", stiffness: 500, damping: 30 }}
                 />
               )}

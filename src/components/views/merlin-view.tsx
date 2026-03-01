@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 import { Zap, Bot, Plus, Loader2, RefreshCw, ExternalLink, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { apiUrl } from "@/lib/config";
-import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
 
 interface MerlinAgent {
@@ -67,28 +66,28 @@ function AgentCard({ agent }: { agent: MerlinAgent }) {
       layout
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className={cn(
-        "flex items-center gap-3 px-4 py-3 rounded-xl",
-        "bg-white dark:bg-gray-800/50",
-        "border border-gray-200/50 dark:border-gray-700/50"
-      )}
+      className="flex items-center gap-3 px-4 py-3 rounded-lg border"
+      style={{ background: "var(--bg-card)", borderColor: "var(--border-default)" }}
     >
-      <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 bg-orange-500/10">
-        <Bot className="w-4 h-4 text-orange-400" />
+      <div
+        className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+        style={{ background: "rgba(232, 69, 60, 0.1)" }}
+      >
+        <Bot className="w-4 h-4" style={{ color: "var(--accent-primary)" }} />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{displayName}</p>
-        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{displayDesc}</p>
+        <p className="text-sm font-medium truncate" style={{ color: "var(--text-primary)" }}>{displayName}</p>
+        <p className="text-xs truncate" style={{ color: "var(--text-secondary)" }}>{displayDesc}</p>
       </div>
       <button
         onClick={handleAdd}
         disabled={adding || added}
-        className={cn(
-          "shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
-          added
-            ? "bg-green-500/10 text-green-400 border border-green-500/20"
-            : "bg-orange-500 text-white hover:bg-orange-600 disabled:opacity-50"
-        )}
+        className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all disabled:opacity-50"
+        style={{
+          background: added ? "rgba(52, 211, 153, 0.1)" : "var(--accent-primary)",
+          color: added ? "var(--accent-green)" : "var(--text-on-accent)",
+          ...(added ? { border: "1px solid rgba(52, 211, 153, 0.2)" } : {}),
+        }}
       >
         {adding ? (
           <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -120,28 +119,28 @@ function SkillCard({ skill }: { skill: MerlinSkill }) {
       layout
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className={cn(
-        "flex items-center gap-3 px-4 py-3 rounded-xl",
-        "bg-white dark:bg-gray-800/50",
-        "border border-gray-200/50 dark:border-gray-700/50"
-      )}
+      className="flex items-center gap-3 px-4 py-3 rounded-lg border"
+      style={{ background: "var(--bg-card)", borderColor: "var(--border-default)" }}
     >
-      <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 bg-purple-500/10">
-        <Zap className="w-4 h-4 text-purple-400" />
+      <div
+        className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+        style={{ background: "rgba(232, 69, 60, 0.1)" }}
+      >
+        <Zap className="w-4 h-4" style={{ color: "var(--accent-primary)" }} />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{displayName}</p>
-        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{displayDesc}</p>
+        <p className="text-sm font-medium truncate" style={{ color: "var(--text-primary)" }}>{displayName}</p>
+        <p className="text-xs truncate" style={{ color: "var(--text-secondary)" }}>{displayDesc}</p>
       </div>
       <button
         onClick={handleNote}
         disabled={noted}
-        className={cn(
-          "shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
-          noted
-            ? "bg-purple-500/10 text-purple-400 border border-purple-500/20"
-            : "bg-purple-600 text-white hover:bg-purple-700 disabled:opacity-50"
-        )}
+        className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all disabled:opacity-50"
+        style={{
+          background: noted ? "rgba(232, 69, 60, 0.08)" : "var(--accent-primary)",
+          color: noted ? "var(--accent-primary)" : "var(--text-on-accent)",
+          ...(noted ? { border: "1px solid rgba(232, 69, 60, 0.2)" } : {}),
+        }}
       >
         {noted ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
         {noted ? "Noted" : "Add"}
@@ -182,21 +181,27 @@ export function MerlinView() {
   }, []);
 
   return (
-    <div className="px-4 py-6 space-y-8 pb-24">
+    <div className="max-w-[800px] mx-auto px-8 pt-6 pb-8 space-y-8">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center">
-          <Zap className="w-5 h-5 text-white" />
+        <div
+          className="w-10 h-10 rounded-lg flex items-center justify-center"
+          style={{ background: "var(--accent-primary)" }}
+        >
+          <Zap className="w-5 h-5" style={{ color: "var(--text-on-accent)" }} />
         </div>
         <div>
-          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">Merlin</h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Agents &amp; skills from merlin.build</p>
+          <h2 className="text-2xl font-semibold" style={{ color: "var(--text-primary)" }}>Merlin</h2>
+          <p className="text-sm" style={{ color: "var(--text-secondary)" }}>Agents &amp; skills from merlin.build</p>
         </div>
         <a
           href="https://merlin.build"
           target="_blank"
           rel="noopener noreferrer"
-          className="ml-auto text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+          className="ml-auto transition-colors"
+          style={{ color: "var(--text-muted)" }}
+          onMouseEnter={(e) => { e.currentTarget.style.color = "var(--text-secondary)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-muted)"; }}
         >
           <ExternalLink className="w-4 h-4" />
         </a>
@@ -205,13 +210,14 @@ export function MerlinView() {
       {/* Agents */}
       <section className="space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+          <h3 className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
             Agents
           </h3>
           <button
             onClick={loadAgents}
             disabled={loadingAgents}
-            className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            className="flex items-center gap-1 text-xs transition-colors"
+            style={{ color: "var(--text-muted)" }}
           >
             <RefreshCw className={cn("w-3 h-3", loadingAgents && "animate-spin")} />
             Refresh
@@ -219,12 +225,12 @@ export function MerlinView() {
         </div>
         {loadingAgents ? (
           <div className="flex justify-center py-8">
-            <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+            <Loader2 className="w-6 h-6 animate-spin" style={{ color: "var(--text-muted)" }} />
           </div>
         ) : agents.length === 0 ? (
           <div className="text-center py-8">
-            <Bot className="w-8 h-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
-            <p className="text-sm text-gray-400">No Merlin agents found</p>
+            <Bot className="w-8 h-8 mx-auto mb-2" style={{ color: "var(--text-muted)" }} />
+            <p className="text-sm" style={{ color: "var(--text-muted)" }}>No Merlin agents found</p>
           </div>
         ) : (
           <div className="space-y-2">
@@ -238,13 +244,14 @@ export function MerlinView() {
       {/* Skills */}
       <section className="space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+          <h3 className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
             Skills
           </h3>
           <button
             onClick={loadSkills}
             disabled={loadingSkills}
-            className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            className="flex items-center gap-1 text-xs transition-colors"
+            style={{ color: "var(--text-muted)" }}
           >
             <RefreshCw className={cn("w-3 h-3", loadingSkills && "animate-spin")} />
             Refresh
@@ -252,12 +259,12 @@ export function MerlinView() {
         </div>
         {loadingSkills ? (
           <div className="flex justify-center py-8">
-            <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+            <Loader2 className="w-6 h-6 animate-spin" style={{ color: "var(--text-muted)" }} />
           </div>
         ) : skills.length === 0 ? (
           <div className="text-center py-8">
-            <Zap className="w-8 h-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
-            <p className="text-sm text-gray-400">No Merlin skills found</p>
+            <Zap className="w-8 h-8 mx-auto mb-2" style={{ color: "var(--text-muted)" }} />
+            <p className="text-sm" style={{ color: "var(--text-muted)" }}>No Merlin skills found</p>
           </div>
         ) : (
           <div className="space-y-2">

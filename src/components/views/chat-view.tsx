@@ -18,21 +18,20 @@ function MessageBubble({ message }: { message: Message }) {
       className={cn("flex", isUser ? "justify-end" : "justify-start")}
     >
       <div
-        className={cn(
-          "max-w-[85%] md:max-w-[70%] px-4 py-3 rounded-2xl",
-          isUser
-            ? "bg-blue-500 text-white rounded-br-md"
-            : "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white rounded-bl-md"
-        )}
+        className="max-w-[85%] md:max-w-[70%] px-4 py-3 rounded-lg"
+        style={{
+          background: isUser ? "var(--accent-primary)" : "var(--bg-elevated)",
+          color: isUser ? "var(--text-on-accent)" : "var(--text-primary)",
+          borderBottomRightRadius: isUser ? "4px" : undefined,
+          borderBottomLeftRadius: !isUser ? "4px" : undefined,
+        }}
       >
         <p className="text-[15px] leading-relaxed whitespace-pre-wrap">
           {message.content}
         </p>
         <p
-          className={cn(
-            "text-[10px] mt-1",
-            isUser ? "text-blue-100" : "text-gray-400"
-          )}
+          className="text-[10px] mt-1"
+          style={{ color: isUser ? "rgba(255,255,255,0.6)" : "var(--text-muted)" }}
         >
           {new Date(message.timestamp).toLocaleTimeString([], {
             hour: "2-digit",
@@ -52,12 +51,16 @@ function TypingIndicator() {
       exit={{ opacity: 0, y: -10 }}
       className="flex justify-start"
     >
-      <div className="bg-gray-100 dark:bg-gray-800 px-4 py-3 rounded-2xl rounded-bl-md">
+      <div
+        className="px-4 py-3 rounded-lg"
+        style={{ background: "var(--bg-elevated)", borderBottomLeftRadius: "4px" }}
+      >
         <div className="flex items-center gap-1">
           {[0, 1, 2].map((i) => (
             <motion.span
               key={i}
-              className="w-2 h-2 rounded-full bg-gray-400"
+              className="w-2 h-2 rounded-full"
+              style={{ background: "var(--text-muted)" }}
               animate={{ y: [0, -5, 0] }}
               transition={{
                 duration: 0.6,
@@ -144,13 +147,16 @@ export function ChatView() {
       <div className="flex-1 overflow-y-auto px-4 py-6 space-y-4">
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center px-8">
-            <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center text-4xl shadow-xl mb-6">
+            <div
+              className="w-20 h-20 rounded-lg flex items-center justify-center text-4xl shadow-xl mb-6"
+              style={{ background: "var(--accent-primary)" }}
+            >
               🦞
             </div>
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
+            <h2 className="text-2xl font-semibold mb-2" style={{ color: "var(--text-primary)" }}>
               Welcome to OpenClaw
             </h2>
-            <p className="text-gray-500 dark:text-gray-400 max-w-md">
+            <p className="max-w-md" style={{ color: "var(--text-secondary)" }}>
               Your personal AI assistant. Ask me anything, set reminders, manage
               your calendar, or just have a conversation.
             </p>
@@ -165,12 +171,10 @@ export function ChatView() {
                 <button
                   key={suggestion}
                   onClick={() => setInput(suggestion)}
-                  className={cn(
-                    "px-4 py-2 rounded-full text-sm font-medium",
-                    "bg-gray-100 hover:bg-gray-200 text-gray-700",
-                    "dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300",
-                    "transition-colors duration-200"
-                  )}
+                  className="px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200"
+                  style={{ background: "var(--bg-card)", color: "var(--text-secondary)" }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = "var(--bg-card-hover)"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = "var(--bg-card)"; }}
                 >
                   {suggestion}
                 </button>
@@ -185,12 +189,14 @@ export function ChatView() {
               ))}
               {isTyping && <TypingIndicator />}
             </AnimatePresence>
-            {/* Clear button */}
             {messages.length > 0 && !isTyping && (
               <div className="flex justify-center pt-4">
                 <button
                   onClick={clearMessages}
-                  className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-red-400 transition-colors"
+                  className="flex items-center gap-1.5 text-xs transition-colors"
+                  style={{ color: "var(--text-muted)" }}
+                  onMouseEnter={(e) => { e.currentTarget.style.color = "#EF4444"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-muted)"; }}
                 >
                   <Trash2 className="w-3 h-3" />
                   Clear conversation
@@ -205,20 +211,17 @@ export function ChatView() {
       {/* Input area */}
       <div className="px-4 pb-4 pb-safe md:pb-4">
         <div
-          className={cn(
-            "flex items-end gap-2 p-2 rounded-2xl",
-            "bg-gray-100 dark:bg-gray-800",
-            "border border-gray-200 dark:border-gray-700",
-            "focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20",
-            "transition-all duration-200"
-          )}
+          className="flex items-end gap-2 p-2 rounded-lg border transition-all duration-200"
+          style={{
+            background: "var(--bg-card)",
+            borderColor: "var(--border-default)",
+          }}
         >
           <button
-            className={cn(
-              "p-2 rounded-xl text-gray-400 hover:text-gray-600",
-              "hover:bg-gray-200 dark:hover:bg-gray-700",
-              "transition-colors duration-200"
-            )}
+            className="p-2 rounded-lg transition-colors duration-200"
+            style={{ color: "var(--text-muted)" }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = "var(--bg-elevated)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
           >
             <Paperclip className="w-5 h-5" />
           </button>
@@ -230,13 +233,8 @@ export function ChatView() {
             onKeyDown={handleKeyDown}
             placeholder="Ask me anything..."
             rows={1}
-            className={cn(
-              "flex-1 bg-transparent resize-none",
-              "text-gray-900 dark:text-white placeholder-gray-400",
-              "focus:outline-none",
-              "max-h-32"
-            )}
-            style={{ minHeight: "24px", height: "auto" }}
+            className="flex-1 bg-transparent resize-none focus:outline-none max-h-32"
+            style={{ color: "var(--text-primary)", minHeight: "24px", height: "auto" }}
           />
 
           {input.trim() ? (
@@ -245,26 +243,19 @@ export function ChatView() {
               animate={{ scale: 1 }}
               onClick={handleSend}
               disabled={isTyping}
-              className={cn(
-                "p-2.5 rounded-xl",
-                "bg-blue-500 text-white",
-                "hover:bg-blue-600",
-                "disabled:opacity-50 disabled:cursor-not-allowed",
-                "transition-colors duration-200"
-              )}
+              className="p-2.5 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+              style={{ background: "var(--accent-primary)", color: "var(--text-on-accent)" }}
             >
               <Send className="w-5 h-5" />
             </motion.button>
           ) : (
             <button
               onClick={() => setIsRecording(!isRecording)}
-              className={cn(
-                "p-2.5 rounded-xl",
-                isRecording
-                  ? "bg-red-500 text-white"
-                  : "text-gray-400 hover:text-gray-600 hover:bg-gray-200 dark:hover:bg-gray-700",
-                "transition-colors duration-200"
-              )}
+              className="p-2.5 rounded-lg transition-colors duration-200"
+              style={{
+                background: isRecording ? "#EF4444" : "transparent",
+                color: isRecording ? "white" : "var(--text-muted)",
+              }}
             >
               {isRecording ? (
                 <StopCircle className="w-5 h-5" />

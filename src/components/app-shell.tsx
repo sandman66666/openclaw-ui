@@ -98,16 +98,13 @@ export function AppShell() {
 
   return (
     <div
-      className={cn(
-        "min-h-screen bg-gray-50 dark:bg-gray-950",
-        "text-gray-900 dark:text-white",
-        "transition-colors duration-300"
-      )}
+      className="min-h-screen text-[var(--text-primary)]"
+      style={{ background: "var(--bg-base)" }}
     >
       {/* Desktop layout */}
       <div className="hidden md:flex h-screen">
         <Sidebar />
-        <main className="flex-1 flex flex-col overflow-hidden">
+        <main className="flex-1 flex flex-col overflow-hidden" style={{ background: "var(--bg-surface)" }}>
           <div className="flex-1 overflow-y-auto">
             <AnimatePresence mode="wait">
               <motion.div

@@ -2,10 +2,9 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, Plus, Trash2, Loader2, Calendar, RefreshCw } from "lucide-react";
+import { Check, Plus, Trash2, Loader2, Calendar, RefreshCw, CheckSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { apiUrl } from "@/lib/config";
-import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
 
 interface Task {
@@ -15,14 +14,6 @@ interface Task {
   dueDate: string | null;
   source?: string;
 }
-
-const inputClasses = cn(
-  "w-full px-3 py-2.5 rounded-xl text-sm",
-  "bg-gray-50 dark:bg-gray-800",
-  "border border-gray-200 dark:border-gray-700",
-  "text-gray-900 dark:text-white placeholder-gray-400",
-  "focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
-);
 
 function TaskItem({
   task,
@@ -39,15 +30,16 @@ function TaskItem({
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, y: 8 }}
+      initial={{ opacity: 0, y: 4 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, x: -20 }}
-      className={cn(
-        "flex items-center gap-3 px-4 py-3 rounded-xl",
-        "bg-white dark:bg-gray-800/50",
-        "border border-gray-200/50 dark:border-gray-700/50",
-        "group transition-all"
-      )}
+      className="flex items-center gap-3 px-4 py-3 group transition-colors duration-150"
+      style={{
+        background: "var(--bg-card)",
+        borderBottom: "1px solid var(--border-subtle)",
+      }}
+      onMouseEnter={(e) => { e.currentTarget.style.background = "var(--bg-card-hover)"; }}
+      onMouseLeave={(e) => { e.currentTarget.style.background = "var(--bg-card)"; }}
     >
       <button
         disabled={loading}
@@ -56,31 +48,30 @@ function TaskItem({
           await onToggle(task.id, !isDone);
           setLoading(false);
         }}
-        className={cn(
-          "w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 transition-colors",
-          isDone
-            ? "bg-green-500 border-green-500 text-white"
-            : "border-gray-300 dark:border-gray-600 hover:border-orange-500"
-        )}
+        className="w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-colors"
+        style={{
+          borderColor: isDone ? "var(--accent-green)" : "var(--border-default)",
+          background: isDone ? "var(--accent-green)" : "transparent",
+        }}
       >
         {loading ? (
-          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+          <Loader2 className="w-3 h-3 animate-spin" style={{ color: "var(--text-secondary)" }} />
         ) : isDone ? (
-          <Check className="w-3.5 h-3.5" />
+          <Check className="w-3 h-3 text-white" />
         ) : null}
       </button>
 
       <div className="flex-1 min-w-0">
-        <p className={cn("text-sm font-medium", isDone && "line-through text-gray-400")}>
+        <p
+          className={cn("text-sm font-medium", isDone && "line-through")}
+          style={{ color: isDone ? "var(--text-muted)" : "var(--text-primary)" }}
+        >
           {task.title}
-          {task.source === "notion" && (
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-400 border border-purple-500/20 font-medium ml-1.5">Notion</span>
-          )}
         </p>
       </div>
 
       {task.dueDate && (
-        <span className="flex items-center gap-1 text-xs text-gray-400 shrink-0">
+        <span className="flex items-center gap-1 text-xs shrink-0" style={{ color: "var(--text-secondary)" }}>
           <Calendar className="w-3 h-3" />
           {new Date(task.dueDate).toLocaleDateString([], { month: "short", day: "numeric" })}
         </span>
@@ -88,7 +79,10 @@ function TaskItem({
 
       <button
         onClick={() => onDelete(task.id)}
-        className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 opacity-0 group-hover:opacity-100 transition-all shrink-0"
+        className="p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-all shrink-0"
+        style={{ color: "var(--text-muted)" }}
+        onMouseEnter={(e) => { e.currentTarget.style.color = "#EF4444"; }}
+        onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-muted)"; }}
       >
         <Trash2 className="w-4 h-4" />
       </button>
@@ -149,11 +143,8 @@ export function TasksView() {
         body: JSON.stringify({ id, status: done ? "Done" : "Not started" }),
       });
       const data = await res.json();
-      if (data.ok) {
-        loadTasks();
-      } else {
-        toast("error", data.error || "Failed to update task");
-      }
+      if (data.ok) loadTasks();
+      else toast("error", data.error || "Failed to update task");
     } catch {
       toast("error", "Failed to update task");
     }
@@ -166,100 +157,108 @@ export function TasksView() {
       if (data.ok) {
         setTasks((prev) => prev.filter((t) => t.id !== id));
         toast("success", "Task deleted");
-      } else {
-        toast("error", data.error || "Failed to delete");
-      }
+      } else toast("error", data.error || "Failed to delete");
     } catch {
       toast("error", "Failed to delete task");
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleAdd();
-    }
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleAdd(); }
   };
 
   const todoTasks = tasks.filter((t) => t.status !== "Done" && t.status !== "done" && t.status !== "Complete");
   const doneTasks = tasks.filter((t) => t.status === "Done" || t.status === "done" || t.status === "Complete");
 
   return (
-    <div className="px-4 py-6 space-y-6 max-w-2xl mx-auto">
+    <div className="max-w-[800px] mx-auto px-8 pt-6 pb-8 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">Tasks</h2>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">
+          <h2 className="text-2xl font-semibold" style={{ color: "var(--text-primary)" }}>Tasks</h2>
+          <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
             {loading ? "Loading..." : `${todoTasks.length} to do, ${doneTasks.length} done`}
           </p>
         </div>
         <button
           onClick={() => { setLoading(true); loadTasks(); }}
-          className="p-2 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+          className="p-2 rounded-lg transition-colors"
+          style={{ color: "var(--text-muted)" }}
         >
           <RefreshCw className={cn("w-4 h-4", loading && "animate-spin")} />
         </button>
       </div>
 
-      {/* Add task form */}
-      <div className="space-y-2">
-        <div className="flex items-center gap-2">
-          <div className="flex-1 flex items-center gap-2">
-            <input
-              className={cn(inputClasses, "flex-1")}
-              value={newTitle}
-              onChange={(e) => setNewTitle(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Add a task..."
-            />
-            <input
-              type="date"
-              className={cn(inputClasses, "w-36 shrink-0")}
-              value={newDate}
-              onChange={(e) => setNewDate(e.target.value)}
-            />
-          </div>
-          <Button
-            size="sm"
-            onClick={handleAdd}
-            disabled={adding || !newTitle.trim()}
-            className="gap-1.5 shrink-0 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white"
-          >
-            {adding ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
-            Add
-          </Button>
-        </div>
-        <label className="flex items-center gap-2 text-xs text-gray-400 pl-1 cursor-pointer">
-          <input type="checkbox" defaultChecked className="rounded border-gray-600 bg-gray-800 text-purple-500 focus:ring-purple-500/20 w-3.5 h-3.5" />
-          Save to Notion
-        </label>
+      {/* Add task bar */}
+      <div
+        className="flex items-center gap-2 p-3 rounded-lg border"
+        style={{ background: "var(--bg-card)", borderColor: "var(--border-default)" }}
+      >
+        <input
+          className="flex-1 px-3 py-2 rounded-lg text-sm border-0 focus:outline-none focus:ring-2"
+          style={{
+            background: "var(--bg-input)",
+            color: "var(--text-primary)",
+            "--tw-ring-color": "rgba(232, 69, 60, 0.15)",
+          } as React.CSSProperties}
+          value={newTitle}
+          onChange={(e) => setNewTitle(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="Add a task..."
+        />
+        <input
+          type="date"
+          className="w-36 shrink-0 px-3 py-2 rounded-lg text-sm border-0 focus:outline-none focus:ring-2"
+          style={{
+            background: "var(--bg-input)",
+            color: "var(--text-primary)",
+            colorScheme: "dark",
+          }}
+          value={newDate}
+          onChange={(e) => setNewDate(e.target.value)}
+        />
+        <button
+          onClick={handleAdd}
+          disabled={adding || !newTitle.trim()}
+          className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold shrink-0 transition-colors disabled:opacity-40"
+          style={{
+            background: "var(--accent-primary)",
+            color: "var(--text-on-accent)",
+          }}
+        >
+          {adding ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+          Add
+        </button>
       </div>
 
       {/* Task list */}
-      <div className="space-y-2">
+      <div className="rounded-lg overflow-hidden border" style={{ borderColor: "var(--border-default)" }}>
         <AnimatePresence mode="popLayout">
           {todoTasks.map((task) => (
             <TaskItem key={task.id} task={task} onToggle={handleToggle} onDelete={handleDelete} />
           ))}
         </AnimatePresence>
+        {todoTasks.length === 0 && !loading && doneTasks.length === 0 && (
+          <div className="text-center py-16">
+            <CheckSquare className="w-12 h-12 mx-auto mb-3" style={{ color: "var(--text-muted)" }} />
+            <p style={{ color: "var(--text-secondary)" }}>No tasks yet</p>
+            <p className="text-sm mt-1" style={{ color: "var(--text-muted)" }}>Add your first task above</p>
+          </div>
+        )}
       </div>
 
       {/* Done section */}
       {doneTasks.length > 0 && (
         <div className="space-y-2">
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-400 pt-2">Completed</h3>
-          <AnimatePresence mode="popLayout">
-            {doneTasks.map((task) => (
-              <TaskItem key={task.id} task={task} onToggle={handleToggle} onDelete={handleDelete} />
-            ))}
-          </AnimatePresence>
-        </div>
-      )}
-
-      {!loading && tasks.length === 0 && (
-        <div className="text-center py-12 text-gray-500">
-          <p className="text-lg mb-1">No tasks yet</p>
-          <p className="text-sm">Add your first task above</p>
+          <h3 className="text-xs font-semibold uppercase tracking-wider pt-2" style={{ color: "var(--text-muted)" }}>
+            Completed
+          </h3>
+          <div className="rounded-lg overflow-hidden border" style={{ borderColor: "var(--border-default)" }}>
+            <AnimatePresence mode="popLayout">
+              {doneTasks.map((task) => (
+                <TaskItem key={task.id} task={task} onToggle={handleToggle} onDelete={handleDelete} />
+              ))}
+            </AnimatePresence>
+          </div>
         </div>
       )}
     </div>
