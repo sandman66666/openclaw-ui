@@ -182,7 +182,7 @@ export const useAppStore = create<AppState>()(
       // Chat
       messages: [],
       isTyping: false,
-      activeAgent: "primary",
+      activeAgent: "webui",
       addMessage: (message) =>
         set((state) => ({ messages: [...state.messages, message] })),
       setMessages: (messages) => set({ messages }),

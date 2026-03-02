@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { execSync } from "child_process";
 
 export async function POST(request: Request) {
-  const { message, agent = "main" } = await request.json();
+  const { message, agent = "webui" } = await request.json();
 
   if (!message) {
     return NextResponse.json({ error: "No message provided" }, { status: 400 });
