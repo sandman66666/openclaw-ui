@@ -4,11 +4,12 @@ import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Bot, Cpu, FolderOpen, Heart, Plus, X, Wand2, Sparkles,
-  ChevronDown, ChevronUp, Trash2, Check, Loader2,
+  ChevronDown, ChevronUp, Trash2, Check, Loader2, MessageSquare,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAppStore, type Agent } from "@/stores/app-store";
 import { apiUrl } from "@/lib/config";
+import { toSanitizedLightMarkdownHtml } from "@/lib/markdown";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -36,7 +37,7 @@ const MODELS = [
 
 // ── Agent Card ───────────────────────────────────────────────────────────────
 
-function AgentCard({ agent, onDelete }: { agent: Agent; onDelete: (id: string) => void }) {
+function AgentCard({ agent, onDelete, onChatWith }: { agent: Agent; onDelete: (id: string) => void; onChatWith: (agentId: string) => void }) {
   const [confirming, setConfirming] = useState(false);
 
   return (
@@ -50,13 +51,13 @@ function AgentCard({ agent, onDelete }: { agent: Agent; onDelete: (id: string) =
           <div className="flex items-center gap-3">
             <div
               className="w-11 h-11 rounded-lg flex items-center justify-center"
-              style={{ background: "rgba(232, 69, 60, 0.1)" }}
+              style={{ background: "rgba(201, 168, 76, 0.1)" }}
             >
               <Bot className="w-5 h-5" style={{ color: "var(--accent-primary)" }} />
             </div>
             <div>
               <h3 className="font-semibold text-sm" style={{ color: "var(--text-primary)" }}>
-                {agent.id === "main" ? "Main Agent" : (agent as any).name || agent.id}
+                {agent.id === "primary" ? "Primary Agent" : (agent as any).name || agent.id}
               </h3>
               <span
                 className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium"
@@ -67,7 +68,7 @@ function AgentCard({ agent, onDelete }: { agent: Agent; onDelete: (id: string) =
               </span>
             </div>
           </div>
-          {agent.id !== "main" && (
+          {agent.id !== "primary" && (
             confirming ? (
               <div className="flex items-center gap-1">
                 <button
@@ -125,6 +126,26 @@ function AgentCard({ agent, onDelete }: { agent: Agent; onDelete: (id: string) =
               </span>
             </div>
           )}
+        </div>
+
+        <div className="pt-2 border-t" style={{ borderColor: "var(--border-subtle)" }}>
+          <button
+            onClick={() => onChatWith(agent.id)}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors"
+            style={{
+              background: "rgba(201, 168, 76, 0.08)",
+              color: "var(--accent-primary)",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "rgba(201, 168, 76, 0.15)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "rgba(201, 168, 76, 0.08)";
+            }}
+          >
+            <MessageSquare className="w-4 h-4" />
+            Chat with Agent
+          </button>
         </div>
       </div>
     </motion.div>
@@ -216,9 +237,11 @@ function SkillPicker({
                 >
                   {skill.name}
                 </p>
-                <p className="text-[10px] line-clamp-2 mt-0.5" style={{ color: "var(--text-muted)" }}>
-                  {skill.description}
-                </p>
+                <div
+                  className="text-[10px] line-clamp-2 mt-0.5"
+                  style={{ color: "var(--text-muted)" }}
+                  dangerouslySetInnerHTML={{ __html: toSanitizedLightMarkdownHtml(skill.description) }}
+                />
               </div>
             </button>
           );
@@ -509,7 +532,7 @@ function CreateAgentPanel({ onCreated, onCancel }: { onCreated: () => void; onCa
 // ── Main View ────────────────────────────────────────────────────────────────
 
 export function AgentsView() {
-  const { agents, loading, setAgents } = useAppStore();
+  const { agents, loading, setAgents, setActiveAgent, setActiveTab } = useAppStore();
   const [showCreate, setShowCreate] = useState(false);
 
   const refreshAgents = async () => {
@@ -526,6 +549,11 @@ export function AgentsView() {
       const data = await res.json();
       if (data.ok) refreshAgents();
     } catch {}
+  };
+
+  const chatWithAgent = (agentId: string) => {
+    setActiveAgent(agentId);
+    setActiveTab("chat");
   };
 
   return (
@@ -574,7 +602,7 @@ export function AgentsView() {
 
       <div className="space-y-3">
         {agents.map((agent) => (
-          <AgentCard key={agent.id} agent={agent} onDelete={deleteAgent} />
+          <AgentCard key={agent.id} agent={agent} onDelete={deleteAgent} onChatWith={chatWithAgent} />
         ))}
       </div>
     </div>

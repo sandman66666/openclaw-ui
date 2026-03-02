@@ -9,6 +9,16 @@ export interface Message {
   timestamp: Date;
 }
 
+export interface Conversation {
+  id: string;
+  agentId: string;
+  agentName: string;
+  title: string;
+  lastMessage: string;
+  lastMessageAt: Date;
+  messageCount: number;
+}
+
 export interface Skill {
   id: string;
   name: string;
@@ -125,6 +135,12 @@ interface AppState {
   agents: Agent[];
   setAgents: (agents: Agent[]) => void;
 
+  // Conversations
+  conversations: Conversation[];
+  setConversations: (conversations: Conversation[]) => void;
+  activeConversation: string | null;
+  setActiveConversation: (id: string | null) => void;
+
   // Navigation
   activeTab: TabId;
   setActiveTab: (tab: TabId) => void;
@@ -166,7 +182,7 @@ export const useAppStore = create<AppState>()(
       // Chat
       messages: [],
       isTyping: false,
-      activeAgent: "main",
+      activeAgent: "primary",
       addMessage: (message) =>
         set((state) => ({ messages: [...state.messages, message] })),
       setMessages: (messages) => set({ messages }),
@@ -201,6 +217,12 @@ export const useAppStore = create<AppState>()(
       // Agents
       agents: [],
       setAgents: (agents) => set({ agents }),
+
+      // Conversations
+      conversations: [],
+      setConversations: (conversations) => set({ conversations }),
+      activeConversation: null,
+      setActiveConversation: (activeConversation) => set({ activeConversation }),
 
       // Navigation
       activeTab: "chat",

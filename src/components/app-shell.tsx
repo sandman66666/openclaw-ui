@@ -9,6 +9,7 @@ import { LoginScreen } from "./auth/login-screen";
 import { Header } from "./layout/header";
 import { Sidebar } from "./layout/sidebar";
 import { BottomNav } from "./layout/bottom-nav";
+import { NavigatorSidebar } from "./layout/navigator-sidebar";
 import { ChatView } from "./views/chat-view";
 import { SkillsView } from "./views/skills-view";
 import { ChannelsView } from "./views/channels-view";
@@ -143,6 +144,9 @@ export function AppShell() {
         </main>
         <BottomNav />
       </div>
+
+      {/* Navigator Sidebar — always available */}
+      <NavigatorSidebar />
     </div>
   );
 }

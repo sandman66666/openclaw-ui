@@ -140,7 +140,7 @@ interface AgentOption {
 }
 
 const DEFAULT_AGENTS: AgentOption[] = [
-  { id: "main", label: "Main Agent" },
+  { id: "primary", label: "Primary Agent" },
 ];
 
 export function ChatView() {
@@ -173,8 +173,8 @@ export function ChatView() {
 
   // Build agent list from store + defaults
   useEffect(() => {
-    const agentOptions: AgentOption[] = [{ id: "main", label: "Main Agent" }];
-    const seen = new Set(["main"]);
+    const agentOptions: AgentOption[] = [{ id: "primary", label: "Primary Agent" }];
+    const seen = new Set(["primary"]);
 
     for (const a of agents) {
       if (!seen.has(a.id)) {
@@ -216,7 +216,7 @@ export function ChatView() {
     async (daysBack: number, before?: Date) => {
       setLoadingHistory(true);
       try {
-        const sessionKey = `agent:main:${activeAgent}`;
+        const sessionKey = `agent:primary:${activeAgent}`;
         const limit = daysBack === 1 ? 80 : 200;
         const res = await fetch(
           apiUrl(`/api/sessions/history?key=${encodeURIComponent(sessionKey)}&limit=${limit}`)
