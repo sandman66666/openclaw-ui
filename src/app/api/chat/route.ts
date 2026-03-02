@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { execSync } from "child_process";
 
 export async function POST(request: Request) {
-  const { message } = await request.json();
+  const { message, agent = "main" } = await request.json();
 
   if (!message) {
     return NextResponse.json({ error: "No message provided" }, { status: 400 });
@@ -10,8 +10,9 @@ export async function POST(request: Request) {
 
   try {
     const escaped = message.replace(/'/g, "'\\''");
+    const escapedAgent = agent.replace(/[^a-zA-Z0-9_-]/g, "");
     const raw = execSync(
-      `openclaw agent --agent webui --message '${escaped}' --json 2>&1`,
+      `openclaw agent --agent ${escapedAgent} --message '${escaped}' --json 2>&1`,
       {
         encoding: "utf-8",
         timeout: 120000,

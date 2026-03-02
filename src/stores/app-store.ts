@@ -76,18 +76,6 @@ export interface Agent {
   heartbeat: Record<string, any>;
 }
 
-export interface ChatThread {
-  id: string;
-  agentId: string;
-  agentModel: string;
-  name: string;
-  messages: Message[];
-  skills: string[];
-  systemPrompt?: string;
-  isTyping: boolean;
-  input: string;
-}
-
 export type TabId = "chat" | "skills" | "channels" | "cron" | "agents" | "settings" | "tasks" | "sessions" | "whatsapp" | "memory" | "merlin" | "nodes" | "chats";
 
 interface AppState {
@@ -112,17 +100,12 @@ interface AppState {
   // Chat
   messages: Message[];
   isTyping: boolean;
+  activeAgent: string;
   addMessage: (message: Message) => void;
+  setMessages: (messages: Message[]) => void;
   setIsTyping: (typing: boolean) => void;
   clearMessages: () => void;
-
-  // Chat Threads
-  threads: ChatThread[];
-  activeThreadId: string | null;
-  addThread: (thread: ChatThread) => void;
-  updateThread: (id: string, updates: Partial<ChatThread>) => void;
-  removeThread: (id: string) => void;
-  setActiveThread: (id: string) => void;
+  setActiveAgent: (agent: string) => void;
 
   // Skills
   skills: Skill[];
@@ -183,31 +166,13 @@ export const useAppStore = create<AppState>()(
       // Chat
       messages: [],
       isTyping: false,
+      activeAgent: "main",
       addMessage: (message) =>
         set((state) => ({ messages: [...state.messages, message] })),
+      setMessages: (messages) => set({ messages }),
       setIsTyping: (isTyping) => set({ isTyping }),
       clearMessages: () => set({ messages: [] }),
-
-      // Chat Threads
-      threads: [],
-      activeThreadId: null,
-      addThread: (thread) =>
-        set((state) => ({ threads: [...state.threads, thread], activeThreadId: thread.id })),
-      updateThread: (id, updates) =>
-        set((state) => ({
-          threads: state.threads.map((t) => (t.id === id ? { ...t, ...updates } : t)),
-        })),
-      removeThread: (id) =>
-        set((state) => {
-          const remaining = state.threads.filter((t) => t.id !== id);
-          return {
-            threads: remaining,
-            activeThreadId: state.activeThreadId === id
-              ? (remaining[0]?.id ?? null)
-              : state.activeThreadId,
-          };
-        }),
-      setActiveThread: (id) => set({ activeThreadId: id }),
+      setActiveAgent: (activeAgent) => set({ activeAgent, messages: [] }),
 
       // Skills (start empty, load from API)
       skills: [],
@@ -254,6 +219,7 @@ export const useAppStore = create<AppState>()(
         gatewayToken: state.gatewayToken,
         gatewayPassword: state.gatewayPassword,
         activeTab: state.activeTab,
+        activeAgent: state.activeAgent,
         // Do NOT persist isAuthenticated or authToken here —
         // we re-derive auth from localStorage on mount in AppShell.
       }),
