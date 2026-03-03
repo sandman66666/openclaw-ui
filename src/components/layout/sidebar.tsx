@@ -94,7 +94,7 @@ export function Sidebar() {
                 <motion.div
                   layoutId="sidebarIndicator"
                   className="absolute inset-0 rounded-lg"
-                  style={{ background: "rgba(232, 69, 60, 0.08)" }}
+                  style={{ background: "rgba(201, 168, 76, 0.08)" }}
                   transition={{ type: "spring", stiffness: 500, damping: 30 }}
                 />
               )}

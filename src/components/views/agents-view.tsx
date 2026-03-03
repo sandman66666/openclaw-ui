@@ -9,7 +9,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useAppStore, type Agent } from "@/stores/app-store";
 import { apiUrl } from "@/lib/config";
-import { toSanitizedLightMarkdownHtml } from "@/lib/markdown";
+// Note: markdown import removed — using plain text for skill descriptions to avoid rendering issues
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -211,7 +211,7 @@ function SkillPicker({
             background: "var(--bg-input)",
             borderColor: "var(--border-default)",
             color: "var(--text-primary)",
-            "--tw-ring-color": "rgba(232, 69, 60, 0.15)",
+            "--tw-ring-color": "rgba(201, 168, 76, 0.15)",
           } as React.CSSProperties}
         />
       </div>
@@ -225,8 +225,8 @@ function SkillPicker({
               onClick={() => onToggle(skill.name)}
               className="flex items-start gap-2 p-2.5 rounded-lg text-left transition-all border"
               style={{
-                background: isSelected ? "rgba(232, 69, 60, 0.06)" : "var(--bg-elevated)",
-                borderColor: isSelected ? "rgba(232, 69, 60, 0.3)" : "var(--border-default)",
+                background: isSelected ? "rgba(201, 168, 76, 0.06)" : "var(--bg-elevated)",
+                borderColor: isSelected ? "rgba(201, 168, 76, 0.3)" : "var(--border-default)",
               }}
             >
               <span className="text-base shrink-0">{skill.emoji || "🔧"}</span>
@@ -237,11 +237,9 @@ function SkillPicker({
                 >
                   {skill.name}
                 </p>
-                <div
-                  className="text-[10px] line-clamp-2 mt-0.5"
-                  style={{ color: "var(--text-muted)" }}
-                  dangerouslySetInnerHTML={{ __html: toSanitizedLightMarkdownHtml(skill.description) }}
-                />
+                <p className="text-[10px] line-clamp-2 mt-0.5" style={{ color: "var(--text-muted)" }}>
+                  {skill.description || ""}
+                </p>
               </div>
             </button>
           );
@@ -352,7 +350,7 @@ function CreateAgentPanel({ onCreated, onCancel }: { onCreated: () => void; onCa
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 20 }}
       className="rounded-lg overflow-hidden border"
-      style={{ background: "var(--bg-card)", borderColor: "rgba(232, 69, 60, 0.2)" }}
+      style={{ background: "var(--bg-card)", borderColor: "rgba(201, 168, 76, 0.2)" }}
     >
       <div className="p-5 space-y-5">
         {/* Header */}
@@ -396,7 +394,7 @@ function CreateAgentPanel({ onCreated, onCancel }: { onCreated: () => void; onCa
                 background: "var(--bg-input)",
                 borderColor: "var(--border-default)",
                 color: "var(--text-primary)",
-                "--tw-ring-color": "rgba(232, 69, 60, 0.15)",
+                "--tw-ring-color": "rgba(201, 168, 76, 0.15)",
               } as React.CSSProperties}
             />
           </div>
@@ -413,7 +411,7 @@ function CreateAgentPanel({ onCreated, onCancel }: { onCreated: () => void; onCa
                 background: "var(--bg-input)",
                 borderColor: "var(--border-default)",
                 color: "var(--text-primary)",
-                "--tw-ring-color": "rgba(232, 69, 60, 0.15)",
+                "--tw-ring-color": "rgba(201, 168, 76, 0.15)",
               } as React.CSSProperties}
             />
           </div>
@@ -432,7 +430,7 @@ function CreateAgentPanel({ onCreated, onCancel }: { onCreated: () => void; onCa
               background: "var(--bg-input)",
               borderColor: "var(--border-default)",
               color: "var(--text-primary)",
-              "--tw-ring-color": "rgba(232, 69, 60, 0.15)",
+              "--tw-ring-color": "rgba(201, 168, 76, 0.15)",
             } as React.CSSProperties}
           >
             {MODELS.map((m) => (
@@ -452,7 +450,7 @@ function CreateAgentPanel({ onCreated, onCancel }: { onCreated: () => void; onCa
               disabled={optimizing || !form.systemPrompt.trim()}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all disabled:opacity-40"
               style={{
-                background: optimizing ? "rgba(232, 69, 60, 0.1)" : form.systemPrompt.trim() ? "var(--accent-primary)" : "var(--bg-elevated)",
+                background: optimizing ? "rgba(201, 168, 76, 0.1)" : form.systemPrompt.trim() ? "var(--accent-primary)" : "var(--bg-elevated)",
                 color: form.systemPrompt.trim() && !optimizing ? "var(--text-on-accent)" : "var(--text-muted)",
               }}
             >
@@ -474,7 +472,7 @@ function CreateAgentPanel({ onCreated, onCancel }: { onCreated: () => void; onCa
               background: "var(--bg-input)",
               borderColor: "var(--border-default)",
               color: "var(--text-primary)",
-              "--tw-ring-color": "rgba(232, 69, 60, 0.15)",
+              "--tw-ring-color": "rgba(201, 168, 76, 0.15)",
             } as React.CSSProperties}
           />
           <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>

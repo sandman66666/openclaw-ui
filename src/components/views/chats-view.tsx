@@ -25,7 +25,7 @@ function NewConversationModal({
 }) {
   const { agents } = useAppStore();
   const [selectedAgent, setSelectedAgent] = useState<string>(
-    agents.length > 0 ? agents[0].id : "primary"
+    agents.length > 0 ? agents[0].id : "webui"
   );
   const [title, setTitle] = useState("");
 
@@ -93,7 +93,7 @@ function NewConversationModal({
                   color: "var(--text-primary)",
                 }}
               >
-                <option value="primary">Primary Agent</option>
+                <option value="webui">Primary Agent</option>
                 {agents.map((agent) => (
                   <option key={agent.id} value={agent.id}>
                     {(agent as any).name || agent.id}
@@ -298,9 +298,26 @@ export function ChatsView() {
         }),
       });
       const data = await res.json();
-      if (data.ok) {
+      if (data.ok || data.conversation) {
+        // Add the new conversation to the store
+        const conv = data.conversation;
+        if (conv) {
+          const { setConversations } = useAppStore.getState();
+          const current = useAppStore.getState().conversations;
+          setConversations([
+            {
+              id: conv.id,
+              agentId: conv.agentId,
+              agentName: conv.agentName || conv.agentId,
+              title: conv.title,
+              lastMessage: conv.lastMessage || "",
+              lastMessageAt: new Date(conv.lastMessageAt),
+              messageCount: conv.messageCount || 0,
+            },
+            ...current,
+          ]);
+        }
         setShowNewModal(false);
-        // Refresh conversations list (would be done by data loader)
       }
     } catch (error) {
       console.error("Failed to create conversation:", error);

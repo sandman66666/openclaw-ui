@@ -417,7 +417,7 @@ export function ChatView() {
                   style={{
                     background:
                       activeAgent === agent.id
-                        ? "rgba(232, 69, 60, 0.06)"
+                        ? "rgba(201, 168, 76, 0.06)"
                         : "transparent",
                     color: "var(--text-primary)",
                   }}
