@@ -81,9 +81,23 @@ export interface CronJob {
 
 export interface Agent {
   id: string;
-  model: string;
+  model: string | { primary: string; fallbacks?: string[] };
   workspace: string;
   heartbeat: Record<string, any>;
+}
+
+/** Extract a display-friendly model label from the model field. */
+export function resolveModelLabel(model: Agent["model"]): string {
+  if (!model) return "-";
+  if (typeof model === "string") return model.trim() || "-";
+  if (typeof model === "object" && model) {
+    const primary = model.primary?.trim();
+    if (primary) {
+      const fb = Array.isArray(model.fallbacks) ? model.fallbacks.length : 0;
+      return fb > 0 ? `${primary} (+${fb} fallback)` : primary;
+    }
+  }
+  return "-";
 }
 
 export type TabId = "chat" | "skills" | "channels" | "cron" | "agents" | "settings" | "tasks" | "sessions" | "whatsapp" | "memory" | "merlin" | "nodes" | "chats";

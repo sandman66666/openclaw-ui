@@ -7,7 +7,7 @@ import {
   ChevronDown, ChevronUp, Trash2, Check, Loader2, MessageSquare,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useAppStore, type Agent } from "@/stores/app-store";
+import { useAppStore, type Agent, resolveModelLabel } from "@/stores/app-store";
 import { apiUrl } from "@/lib/config";
 // Note: markdown import removed — using plain text for skill descriptions to avoid rendering issues
 
@@ -105,7 +105,7 @@ function AgentCard({ agent, onDelete, onChatWith }: { agent: Agent; onDelete: (i
             <Cpu className="w-4 h-4 shrink-0" style={{ color: "var(--text-muted)" }} />
             <span style={{ color: "var(--text-secondary)" }}>Model:</span>
             <span className="font-mono text-xs truncate" style={{ color: "var(--text-primary)" }}>
-              {agent.model}
+              {resolveModelLabel(agent.model)}
             </span>
           </div>
           <div className="flex items-center gap-3 text-sm">
