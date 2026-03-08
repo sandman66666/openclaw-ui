@@ -136,8 +136,11 @@ export function getChannels() {
 }
 
 export function getSessions() {
-  const raw = run("openclaw sessions list --json 2>/dev/null || echo '[]'");
-  return parseJson(raw) ?? [];
+  const raw = run("openclaw sessions --all-agents --json 2>/dev/null || echo '{}'");
+  const parsed = parseJson(raw);
+  if (parsed && Array.isArray(parsed.sessions)) return parsed.sessions;
+  if (Array.isArray(parsed)) return parsed;
+  return [];
 }
 
 // ── Memory file helpers ─────────────────────────────────────────────────

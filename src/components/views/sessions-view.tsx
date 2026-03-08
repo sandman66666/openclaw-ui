@@ -64,7 +64,7 @@ function SessionCard({
     try {
       const res = await fetch(apiUrl(`/api/sessions/history?key=${encodeURIComponent(sessionKey)}`));
       const data = await res.json();
-      setHistory(data.history ?? []);
+      setHistory(data.messages ?? data.history ?? []);
     } catch {
       toast("error", "Failed to load history");
     }

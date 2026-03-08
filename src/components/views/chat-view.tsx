@@ -216,7 +216,7 @@ export function ChatView() {
     async (daysBack: number, before?: Date) => {
       setLoadingHistory(true);
       try {
-        const sessionKey = activeAgent === "webui" ? "main" : `agent:${activeAgent}`;
+        const sessionKey = activeAgent === "webui" ? "agent:main:main" : `agent:${activeAgent}:main`;
         const limit = daysBack === 1 ? 80 : 200;
         const res = await fetch(
           apiUrl(`/api/sessions/history?key=${encodeURIComponent(sessionKey)}&limit=${limit}`)
